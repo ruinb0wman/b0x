@@ -21,15 +21,22 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   createTerminal: async (options: { cols: number; rows: number }) => {
     try {
-      return await ipcRenderer.invoke('createTerminal', options)
+      const terminal = await ipcRenderer.invoke('createTerminal', options)
+      return {
+        ...terminal,
+        onData: (callback: (data: string) => void) => {
+          // Data events are handled in main process and forwarded via separate channel
+          ipcRenderer.on(`terminal-data-${terminal.processId}`, (_, data) => callback(data))
+        }
+      }
     } catch (error) {
       console.error('Terminal creation failed:', error)
-      // Fallback to basic terminal if native one fails
       return {
-        onData: () => {},
+        processId: 'fallback',
         write: () => {},
         resize: () => {},
-        kill: () => {}
+        kill: () => {},
+        onData: () => {}
       }
     }
   },

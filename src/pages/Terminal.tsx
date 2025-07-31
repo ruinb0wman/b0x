@@ -29,13 +29,13 @@ export default function Terminal() {
     // Create terminal session
     const setupTerminal = async () => {
       const { cols, rows } = terminal.current as Xterminal
-      const pty = await window.ipcRenderer.invoke('createTerminal', { cols, rows });
+      const pty = await window.ipcRenderer.createTerminal({ cols, rows })
 
       terminal.current?.onData(data => {
         pty.write(data)
       })
 
-      pty.onData((data: any) => {
+      pty.onData(data => {
         terminal.current?.write(data)
       })
 

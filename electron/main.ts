@@ -69,10 +69,16 @@ app.on('activate', () => {
 app.whenReady().then(() => {
   createWindow()
 
-  ipcMain.handle('createTerminal', (_, { cols, rows }) => {
+  const processes = new Map<string, any>()
+
+  ipcMain.handle('createTerminal', (event, { cols, rows }) => {
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
     try {
       const ptyProcess = spawn(shell, [], {
+        // Forward data events to renderer
+        ptyProcess.onData(data => {
+          event.sender.send(`terminal-data-${processId}`, data)
+        })
       name: 'xterm-color',
       cols: cols || 80,
       rows: rows || 30,
@@ -80,18 +86,19 @@ app.whenReady().then(() => {
       env: process.env
     })
 
+    // Store the process in main process memory
+    const processId = Date.now().toString()
+    const processes = new Map<string, any>()
+    processes.set(processId, ptyProcess)
+
+    // Return only the process ID and control methods
     return {
-      onData: (callback: (data: string) => void) => {
-        ptyProcess.onData(callback)
-      },
-      write: (data: string) => {
-        ptyProcess.write(data)
-      },
-      resize: (cols: number, rows: number) => {
-        ptyProcess.resize(cols, rows)
-      },
+      processId,
+      write: (data: string) => ptyProcess.write(data),
+      resize: (cols: number, rows: number) => ptyProcess.resize(cols, rows),
       kill: () => {
         ptyProcess.kill()
+        processes.delete(processId)
       }
     }
     } catch (error) {
