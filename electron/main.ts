@@ -71,7 +71,8 @@ app.whenReady().then(() => {
 
   ipcMain.handle('createTerminal', (_, { cols, rows }) => {
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
-    const ptyProcess = spawn(shell, [], {
+    try {
+      const ptyProcess = spawn(shell, [], {
       name: 'xterm-color',
       cols: cols || 80,
       rows: rows || 30,
@@ -92,6 +93,10 @@ app.whenReady().then(() => {
       kill: () => {
         ptyProcess.kill()
       }
+    }
+    } catch (error) {
+      console.error('Failed to spawn terminal:', error)
+      throw error
     }
   })
 })

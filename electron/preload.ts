@@ -19,5 +19,18 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke(channel, ...omit)
   },
 
-  createTerminal: (options: { cols: number; rows: number }) => ipcRenderer.invoke('createTerminal', options),
+  createTerminal: async (options: { cols: number; rows: number }) => {
+    try {
+      return await ipcRenderer.invoke('createTerminal', options)
+    } catch (error) {
+      console.error('Terminal creation failed:', error)
+      // Fallback to basic terminal if native one fails
+      return {
+        onData: () => {},
+        write: () => {},
+        resize: () => {},
+        kill: () => {}
+      }
+    }
+  },
 })
