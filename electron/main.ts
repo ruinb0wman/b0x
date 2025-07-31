@@ -75,10 +75,6 @@ app.whenReady().then(() => {
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
     try {
       const ptyProcess = spawn(shell, [], {
-        // Forward data events to renderer
-        ptyProcess.onData(data => {
-          event.sender.send(`terminal-data-${processId}`, data)
-        })
       name: 'xterm-color',
       cols: cols || 80,
       rows: rows || 30,
@@ -88,17 +84,37 @@ app.whenReady().then(() => {
 
     // Store the process in main process memory
     const processId = Date.now().toString()
-    const processes = new Map<string, any>()
     processes.set(processId, ptyProcess)
 
-    // Return only the process ID and control methods
+    // Setup data listener
+    ptyProcess.onData(data => {
+      event.sender.send(`terminal-data-${processId}`, data)
+    })
+
+    // Return only serializable data
     return {
       processId,
-      write: (data: string) => ptyProcess.write(data),
-      resize: (cols: number, rows: number) => ptyProcess.resize(cols, rows),
+      write: (data: string) => {
+        try {
+          ptyProcess.write(data)
+        } catch (err) {
+          console.error('Write error:', err)
+        }
+      },
+      resize: (cols: number, rows: number) => {
+        try {
+          ptyProcess.resize(cols, rows)
+        } catch (err) {
+          console.error('Resize error:', err)
+        }
+      },
       kill: () => {
-        ptyProcess.kill()
-        processes.delete(processId)
+        try {
+          ptyProcess.kill()
+          processes.delete(processId)
+        } catch (err) {
+          console.error('Kill error:', err)
+        }
       }
     }
     } catch (error) {

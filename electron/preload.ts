@@ -25,9 +25,15 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
       return {
         ...terminal,
         onData: (callback: (data: string) => void) => {
-          // Data events are handled in main process and forwarded via separate channel
-          ipcRenderer.on(`terminal-data-${terminal.processId}`, (_, data) => callback(data))
-        }
+          const channel = `terminal-data-${terminal.processId}`
+          const listener = (_, data: string) => callback(data)
+          ipcRenderer.on(channel, listener)
+          
+          // Return cleanup function
+          return () => {
+            ipcRenderer.off(channel, listener)
+          }
+        },
       }
     } catch (error) {
       console.error('Terminal creation failed:', error)

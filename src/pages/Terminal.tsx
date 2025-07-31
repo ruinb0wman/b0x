@@ -35,9 +35,14 @@ export default function Terminal() {
         pty.write(data)
       })
 
-      pty.onData(data => {
+      const cleanupDataListener = pty.onData(data => {
         terminal.current?.write(data)
       })
+
+      return () => {
+        cleanupDataListener?.()
+        pty.kill()
+      }
 
       // Handle resize
       const resizeObserver = new ResizeObserver(() => {
