@@ -21,19 +21,19 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   createTerminal: async (options: { cols: number; rows: number }) => {
     try {
-      const terminal = await ipcRenderer.invoke('createTerminal', options)
+      const { processId } = await ipcRenderer.invoke('createTerminal', options)
+      
       return {
-        ...terminal,
+        processId,
+        write: (data: string) => ipcRenderer.send(`terminal-write-${processId}`, data),
+        resize: (cols: number, rows: number) => ipcRenderer.send(`terminal-resize-${processId}`, { cols, rows }),
+        kill: () => ipcRenderer.send(`terminal-kill-${processId}`),
         onData: (callback: (data: string) => void) => {
-          const channel = `terminal-data-${terminal.processId}`
+          const channel = `terminal-data-${processId}`
           const listener = (_, data: string) => callback(data)
           ipcRenderer.on(channel, listener)
-          
-          // Return cleanup function
-          return () => {
-            ipcRenderer.off(channel, listener)
-          }
-        },
+          return () => ipcRenderer.off(channel, listener)
+        }
       }
     } catch (error) {
       console.error('Terminal creation failed:', error)

@@ -71,6 +71,23 @@ app.whenReady().then(() => {
 
   const processes = new Map<string, any>()
 
+  // Add these before the createTerminal handler
+  ipcMain.on(`terminal-write-${processId}`, (_, data) => {
+    const pty = processes.get(processId)
+    pty?.write(data)
+  })
+
+  ipcMain.on(`terminal-resize-${processId}`, (_, { cols, rows }) => {
+    const pty = processes.get(processId)
+    pty?.resize(cols, rows)
+  })
+
+  ipcMain.on(`terminal-kill-${processId}`, () => {
+    const pty = processes.get(processId)
+    pty?.kill()
+    processes.delete(processId)
+  })
+
   ipcMain.handle('createTerminal', (event, { cols, rows }) => {
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
     try {
@@ -91,31 +108,8 @@ app.whenReady().then(() => {
       event.sender.send(`terminal-data-${processId}`, data)
     })
 
-    // Return only serializable data
-    return {
-      processId,
-      write: (data: string) => {
-        try {
-          ptyProcess.write(data)
-        } catch (err) {
-          console.error('Write error:', err)
-        }
-      },
-      resize: (cols: number, rows: number) => {
-        try {
-          ptyProcess.resize(cols, rows)
-        } catch (err) {
-          console.error('Resize error:', err)
-        }
-      },
-      kill: () => {
-        try {
-          ptyProcess.kill()
-          processes.delete(processId)
-        } catch (err) {
-          console.error('Kill error:', err)
-        }
-      }
+    // Return only the processId - all operations will be done via separate IPC calls
+    return { processId }
     }
     } catch (error) {
       console.error('Failed to spawn terminal:', error)

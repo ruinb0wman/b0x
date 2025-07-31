@@ -31,13 +31,8 @@ export default function Terminal() {
       const { cols, rows } = terminal.current as Xterminal
       const pty = await window.ipcRenderer.createTerminal({ cols, rows })
 
-      terminal.current?.onData(data => {
-        pty.write(data)
-      })
-
-      const cleanupDataListener = pty.onData(data => {
-        terminal.current?.write(data)
-      })
+      terminal.current?.onData(data => pty.write(data))
+      const cleanupDataListener = pty.onData(data => terminal.current?.write(data))
 
       return () => {
         cleanupDataListener?.()
