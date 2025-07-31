@@ -1,0 +1,16 @@
+{
+  "include": [
+    "src/**/*",
+    "public/**/*",
+    "electron/**/*",
+    "package.json",
+    "tsconfig.json",
+    "tsconfig.node.json",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "target": "/mnt/d/Workspace/b0x/"
+}

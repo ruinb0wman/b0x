@@ -3,14 +3,6 @@ import { Terminal as Xterminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 
-// declare global {
-//   interface Window {
-//     ipcRenderer: {
-//       createTerminal: (options: { cols: number; rows: number }) => Promise<any>
-//     }
-//   }
-// }
-
 export default function Terminal() {
   const terminalRef = useRef<HTMLDivElement>(null)
   const terminal = useRef<Xterminal>()
@@ -37,13 +29,13 @@ export default function Terminal() {
     // Create terminal session
     const setupTerminal = async () => {
       const { cols, rows } = terminal.current as Xterminal
-      const pty = await window.ipcRenderer.createTerminal({ cols, rows })
+      const pty = await window.ipcRenderer.invoke('createTerminal', { cols, rows });
 
       terminal.current?.onData(data => {
         pty.write(data)
       })
 
-      pty.onData(data => {
+      pty.onData((data: any) => {
         terminal.current?.write(data)
       })
 
