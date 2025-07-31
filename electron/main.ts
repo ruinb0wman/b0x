@@ -1,4 +1,5 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
+import { spawn } from 'node-pty'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -65,4 +66,32 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  createWindow()
+
+  ipcMain.handle('createTerminal', (_, { cols, rows }) => {
+    const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
+    const ptyProcess = spawn(shell, [], {
+      name: 'xterm-color',
+      cols: cols || 80,
+      rows: rows || 30,
+      cwd: process.env.HOME,
+      env: process.env
+    })
+
+    return {
+      onData: (callback: (data: string) => void) => {
+        ptyProcess.onData(callback)
+      },
+      write: (data: string) => {
+        ptyProcess.write(data)
+      },
+      resize: (cols: number, rows: number) => {
+        ptyProcess.resize(cols, rows)
+      },
+      kill: () => {
+        ptyProcess.kill()
+      }
+    }
+  })
+})

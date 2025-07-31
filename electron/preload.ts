@@ -19,6 +19,5 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke(channel, ...omit)
   },
 
-  // You can expose other APTs you need here.
-  // ...
+  createTerminal: (options: { cols: number; rows: number }) => ipcRenderer.invoke('createTerminal', options),
 })
