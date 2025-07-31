@@ -17,7 +17,8 @@ export default function Terminal() {
   const fitAddon = useRef<FitAddon>()
 
   useEffect(() => {
-    if (!terminalRef.current) return
+    const container = terminalRef.current
+    if (!container) return
 
     // Initialize terminal
     terminal.current = new Xterminal({
@@ -52,7 +53,9 @@ export default function Terminal() {
         const { cols, rows } = terminal.current as Xterminal
         pty.resize(cols, rows)
       })
-      resizeObserver.observe(terminalRef.current)
+      if (terminalRef.current) {
+        resizeObserver.observe(terminalRef.current)
+      }
     }
 
     setupTerminal()
