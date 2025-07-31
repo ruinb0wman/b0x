@@ -1,26 +1,26 @@
 import { useEffect, useRef } from 'react'
-import { Terminal } from '@xterm/xterm'
+import { Terminal as Xterminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 
-declare global {
-  interface Window {
-    ipcRenderer: {
-      createTerminal: (options: { cols: number; rows: number }) => Promise<any>
-    }
-  }
-}
+// declare global {
+//   interface Window {
+//     ipcRenderer: {
+//       createTerminal: (options: { cols: number; rows: number }) => Promise<any>
+//     }
+//   }
+// }
 
 export default function Terminal() {
   const terminalRef = useRef<HTMLDivElement>(null)
-  const terminal = useRef<Terminal>()
+  const terminal = useRef<Xterminal>()
   const fitAddon = useRef<FitAddon>()
 
   useEffect(() => {
     if (!terminalRef.current) return
 
     // Initialize terminal
-    terminal.current = new Terminal({
+    terminal.current = new Xterminal({
       cursorBlink: true,
       fontFamily: 'monospace',
       theme: {
@@ -35,9 +35,9 @@ export default function Terminal() {
 
     // Create terminal session
     const setupTerminal = async () => {
-      const { cols, rows } = terminal.current as Terminal
+      const { cols, rows } = terminal.current as Xterminal
       const pty = await window.ipcRenderer.createTerminal({ cols, rows })
-      
+
       terminal.current?.onData(data => {
         pty.write(data)
       })
@@ -49,7 +49,7 @@ export default function Terminal() {
       // Handle resize
       const resizeObserver = new ResizeObserver(() => {
         fitAddon.current?.fit()
-        const { cols, rows } = terminal.current as Terminal
+        const { cols, rows } = terminal.current as Xterminal
         pty.resize(cols, rows)
       })
       resizeObserver.observe(terminalRef.current)
@@ -63,8 +63,8 @@ export default function Terminal() {
   }, [])
 
   return (
-    <div 
-      ref={terminalRef} 
+    <div
+      ref={terminalRef}
       style={{
         width: '100%',
         height: '100%',
