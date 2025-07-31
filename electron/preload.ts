@@ -25,9 +25,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
       
       return {
         processId,
-        write: (data: string) => ipcRenderer.send(`terminal-write-${processId}`, data),
-        resize: (cols: number, rows: number) => ipcRenderer.send(`terminal-resize-${processId}`, { cols, rows }),
-        kill: () => ipcRenderer.send(`terminal-kill-${processId}`),
+        write: (data: string) => ipcRenderer.send('terminal-write', { processId, data }),
+        resize: (cols: number, rows: number) => ipcRenderer.send('terminal-resize', { processId, cols, rows }),
+        kill: () => ipcRenderer.send('terminal-kill', processId),
         onData: (callback: (data: string) => void) => {
           const channel = `terminal-data-${processId}`
           const listener = (_, data: string) => callback(data)

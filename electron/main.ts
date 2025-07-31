@@ -71,18 +71,18 @@ app.whenReady().then(() => {
 
   const processes = new Map<string, any>()
 
-  // Add these before the createTerminal handler
-  ipcMain.on(`terminal-write-${processId}`, (_, data) => {
+  // Handle terminal operations
+  ipcMain.on('terminal-write', (event, { processId, data }) => {
     const pty = processes.get(processId)
     pty?.write(data)
   })
 
-  ipcMain.on(`terminal-resize-${processId}`, (_, { cols, rows }) => {
+  ipcMain.on('terminal-resize', (event, { processId, cols, rows }) => {
     const pty = processes.get(processId)
     pty?.resize(cols, rows)
   })
 
-  ipcMain.on(`terminal-kill-${processId}`, () => {
+  ipcMain.on('terminal-kill', (event, processId) => {
     const pty = processes.get(processId)
     pty?.kill()
     processes.delete(processId)
@@ -92,6 +92,26 @@ app.whenReady().then(() => {
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
     try {
       const ptyProcess = spawn(shell, [], {
+        name: 'xterm-color',
+        cols: cols || 80,
+        rows: rows || 30,
+        cwd: process.env.HOME,
+        env: process.env
+      })
+
+      const processId = Date.now().toString()
+      processes.set(processId, ptyProcess)
+
+      ptyProcess.onData(data => {
+        event.sender.send(`terminal-data-${processId}`, data)
+      })
+
+      return { processId }
+    } catch (error) {
+      console.error('Failed to spawn terminal:', error)
+      throw error
+    }
+  })
       name: 'xterm-color',
       cols: cols || 80,
       rows: rows || 30,

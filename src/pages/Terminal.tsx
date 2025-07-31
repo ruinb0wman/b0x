@@ -43,7 +43,9 @@ export default function Terminal() {
       const resizeObserver = new ResizeObserver(() => {
         fitAddon.current?.fit()
         const { cols, rows } = terminal.current as Xterminal
-        pty.resize(cols, rows)
+        if (cols > 0 && rows > 0) {
+          pty.resize(cols, rows)
+        }
       })
       if (terminalRef.current) {
         resizeObserver.observe(terminalRef.current)
