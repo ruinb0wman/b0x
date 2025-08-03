@@ -41,6 +41,7 @@ export class TerminalManager {
     })
 
     ipcMain.handle('terminal:write', (_, { id, data }) => {
+      console.log('get message from xterm', id, data)
       const pty = this.terminals.get(id)
       pty?.write(data)
     })
