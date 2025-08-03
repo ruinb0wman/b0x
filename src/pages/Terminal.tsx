@@ -51,25 +51,25 @@ export default function TerminalComponent() {
       })
 
       // Handle resize
-      const resizeObserver = new ResizeObserver(() => {
-        if (fitAddon.current && terminalId.current) {
-          fitAddon.current.fit()
-          const { cols, rows } = terminal
-          window.ipcRenderer.invoke('terminal:resize', {
-            id: terminalId.current,
-            cols,
-            rows
-          })
-        }
-      })
-
-      resizeObserver.observe(terminalRef.current)
+      // const resizeObserver = new ResizeObserver(() => {
+      //   if (fitAddon.current && terminalId.current) {
+      //     fitAddon.current.fit()
+      //     const { cols, rows } = terminal
+      //     window.ipcRenderer.invoke('terminal:resize', {
+      //       id: terminalId.current,
+      //       cols,
+      //       rows
+      //     })
+      //   }
+      // })
+      //
+      // resizeObserver.observe(terminalRef.current)
 
       return () => {
         if (terminalId.current) {
           window.ipcRenderer.invoke('terminal:destroy', terminalId.current)
         }
-        resizeObserver.disconnect()
+        // resizeObserver.disconnect()
       }
     })
 
