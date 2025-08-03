@@ -29,19 +29,23 @@ export default function TerminalComponent() {
     terminal.loadAddon(fitAddon.current)
     terminal.loadAddon(new WebglAddon())
 
-    // Open terminal
+    // Open terminal and wait for initialization
     terminal.open(terminalRef.current)
     
-    // Initial fit and get dimensions
-    fitAddon.current.fit()
-    const initialCols = terminal.cols
-    const initialRows = terminal.rows
+    // Use setTimeout to ensure terminal is fully initialized
+    setTimeout(() => {
+      try {
+        if (!fitAddon.current) throw new Error('FitAddon not initialized')
+        
+        fitAddon.current.fit()
+        const initialCols = Math.max(terminal.cols || 80, 10)
+        const initialRows = Math.max(terminal.rows || 24, 5)
 
-    // Create terminal session with initial dimensions
-    window.ipcRenderer.invoke('terminal:create', {
-      cols: initialCols,
-      rows: initialRows
-    }).then((id) => {
+        // Create terminal session with initial dimensions
+        window.ipcRenderer.invoke('terminal:create', {
+          cols: initialCols,
+          rows: initialRows
+        }).then((id) => {
       terminalId.current = id
 
       // Handle data from terminal
@@ -82,8 +86,12 @@ export default function TerminalComponent() {
         if (terminalId.current) {
           window.ipcRenderer.invoke('terminal:destroy', terminalId.current)
         }
-        // resizeObserver.disconnect()
+        resizeObserver.disconnect()
       }
+    }).catch(err => {
+      console.error('Terminal initialization failed:', err)
+    })
+  }, 100) // 100ms delay to ensure terminal is ready
     })
 
     return () => {
@@ -91,5 +99,16 @@ export default function TerminalComponent() {
     }
   }, [])
 
-  return <div ref={terminalRef} style={{ width: '100%', height: '100%' }} />
+  return (
+    <div style={{ 
+      width: '100%', 
+      height: '100%',
+      minHeight: '300px',
+      padding: '8px',
+      boxSizing: 'border-box',
+      backgroundColor: '#1e1e1e'
+    }}>
+      <div ref={terminalRef} style={{ width: '100%', height: '100%' }} />
+    </div>
+  )
 }
