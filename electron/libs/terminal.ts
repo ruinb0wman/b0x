@@ -1,6 +1,6 @@
 import { spawn } from 'node-pty'
 import type { IPty } from 'node-pty'
-import { ipcMain } from 'electron'
+import { ipcMain, BrowserWindow } from 'electron'
 
 export class TerminalManager {
   private terminals: Map<number, IPty> = new Map()
@@ -35,7 +35,10 @@ export class TerminalManager {
       // Send data from terminal to renderer
       ptyProcess.on('data', data => {
         console.log('send data to renderer', data)
-        ipcMain.emit('terminal:data', id, data)
+        const win = BrowserWindow.getFocusedWindow()
+        if (win) {
+          win.webContents.send('terminal:data', data)
+        }
       })
 
       return id

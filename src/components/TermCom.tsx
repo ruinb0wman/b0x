@@ -55,15 +55,6 @@ export default function TermCom() {
           console.log('Terminal created with id:', id)
           terminalId.current = id
 
-          // Handle data from terminal
-          window.ipcRenderer.on('terminal:data', (_, data) => {
-            console.log('Received data from pty:', data)
-            try {
-              terminal.write(data)
-            } catch (e) {
-              console.error('Failed to write terminal data:', e)
-            }
-          })
 
           // Handle input from user
           // Focus terminal when clicked
