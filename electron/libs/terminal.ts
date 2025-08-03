@@ -34,6 +34,7 @@ export class TerminalManager {
 
       // Send data from terminal to renderer
       ptyProcess.on('data', data => {
+        console.log('send data to renderer', data)
         ipcMain.emit('terminal:data', id, data)
       })
 
