@@ -26,8 +26,11 @@ export function usePty() {
 
       // Send data from terminal to renderer
       ptyProcess.on('data', data => {
-        console.log('[pty:send terminal:data]', data)
-        win.webContents.send('terminal:data', data)
+        console.log('[pty:send terminal:data]', ptyProcess.pid, data)
+        win.webContents.send('terminal:data', {
+          id: ptyProcess.pid,
+          data
+        })
       })
 
       ptys.set(ptyProcess.pid, ptyProcess);
