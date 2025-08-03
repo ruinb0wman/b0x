@@ -58,6 +58,7 @@ export default function TermCom() {
 
           // Handle terminal output from backend
           window.ipcRenderer.on('terminal:data', (event, { id, data }) => {
+            console.log('terminal:data', id, data)
             if (id === terminalId.current) {
               terminal.write(data)
             }
