@@ -17,6 +17,8 @@ export default function TermCom() {
     const terminal = new Terminal({
       cursorBlink: true,
       fontFamily: '"CaskaydiaCove Nerd Font Mono", "Courier New", monospace',
+      scrollback: 0,  // Disable scrollback buffer
+      scrollOnUserInput: false,  // Don't scroll on input
       fontSize: 16,
       fontWeight: 'normal',
       fontWeightBold: 'bold',
@@ -179,7 +181,8 @@ export default function TermCom() {
       <div ref={terminalRef} style={{
         width: '100%',
         height: '100%',
-        minHeight: '300px'
+        minHeight: '300px',
+        overflow: 'hidden'
       }} />
     </div>
   )
