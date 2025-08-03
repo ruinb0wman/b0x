@@ -16,7 +16,7 @@ export default function TermCom() {
     // Initialize terminal
     const terminal = new Terminal({
       cursorBlink: true,
-      fontFamily: 'Consolas, monospace',
+      fontFamily: '"Cascadia Code", "Courier New", "monospace"',
       theme: {
         background: '#1e1e1e',
         foreground: '#ffffff'
