@@ -32,12 +32,13 @@ export default function TerminalComponent() {
     // Open terminal and wait for initialization
     terminal.open(terminalRef.current)
     
-    // Use setTimeout to ensure terminal is fully initialized
-    setTimeout(() => {
-      try {
-        if (!fitAddon.current) throw new Error('FitAddon not initialized')
-        
-        fitAddon.current.fit()
+    // Initial fit right after opening
+    try {
+      if (!fitAddon.current) throw new Error('FitAddon not initialized')
+      
+      // Force a layout calculation
+      setTimeout(() => {
+        fitAddon.current?.fit()
         const initialCols = Math.max(terminal.cols || 80, 10)
         const initialRows = Math.max(terminal.rows || 24, 5)
 
@@ -61,12 +62,15 @@ export default function TerminalComponent() {
             })
           })
 
-          // Handle resize
+          // Handle resize with debounce
+          let resizeTimeout: NodeJS.Timeout
           const resizeObserver = new ResizeObserver(() => {
-            if (fitAddon.current && terminalId.current) {
-              try {
-                fitAddon.current.fit()
-                const { cols, rows } = terminal
+            clearTimeout(resizeTimeout)
+            resizeTimeout = setTimeout(() => {
+              if (fitAddon.current && terminalId.current && terminalRef.current) {
+                try {
+                  fitAddon.current.fit()
+                  const { cols, rows } = terminal
                 window.ipcRenderer.invoke('terminal:resize', {
                   id: terminalId.current,
                   cols,
@@ -99,21 +103,25 @@ export default function TerminalComponent() {
     return () => {
       terminal.dispose()
     }
-    return () => {
-      terminal.dispose()
-    }
   }, [])
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '100%',
-      minHeight: '300px',
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      width: '100%',
+      height: '100vh',
       padding: '8px',
       boxSizing: 'border-box',
-      backgroundColor: '#1e1e1e'
+      backgroundColor: '#1e1e1e',
+      overflow: 'hidden'
     }}>
-      <div ref={terminalRef} style={{ width: '100%', height: '100%' }} />
+      <div ref={terminalRef} style={{
+        width: '100%',
+        height: '100%',
+        minHeight: '300px',
+        overflow: 'hidden'
+      }} />
     </div>
   )
 }
