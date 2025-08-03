@@ -29,17 +29,22 @@ export default function TerminalComponent() {
     terminal.loadAddon(fitAddon.current)
     terminal.loadAddon(new WebglAddon())
 
-    // Open terminal and wait for initialization
+    // Open terminal
     terminal.open(terminalRef.current)
     
-    // Initial fit right after opening
+    // Force layout calculation before fitting
     setTimeout(() => {
       try {
         if (!fitAddon.current) throw new Error('FitAddon not initialized')
         
+        // Force a layout pass
+        terminalRef.current?.clientWidth
+        terminalRef.current?.clientHeight
+        
+        // Fit terminal to container
         fitAddon.current.fit()
-        const initialCols = Math.max(terminal.cols || 80, 10)
-        const initialRows = Math.max(terminal.rows || 24, 5)
+        const initialCols = Math.max(terminal.cols, 10)
+        const initialRows = Math.max(terminal.rows, 5)
 
         // Create terminal session with initial dimensions
         window.ipcRenderer.invoke('terminal:create', {
@@ -54,12 +59,22 @@ export default function TerminalComponent() {
           })
 
           // Handle input from user
-          terminal.onData((data) => {
-            window.ipcRenderer.invoke('terminal:write', {
-              id: terminalId.current,
-              data
-            })
+          // Focus terminal when clicked
+          terminalRef.current?.addEventListener('click', () => {
+            terminal.focus()
           })
+
+          terminal.onData((data) => {
+            if (terminalId.current) {
+              window.ipcRenderer.invoke('terminal:write', {
+                id: terminalId.current,
+                data
+              })
+            }
+          })
+
+          // Initial focus
+          setTimeout(() => terminal.focus(), 200)
 
           // Handle resize with debounce
           let resizeTimeout: NodeJS.Timeout
@@ -110,17 +125,20 @@ export default function TerminalComponent() {
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
-      height: '100vh',
+      height: '100%',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       padding: '8px',
       boxSizing: 'border-box',
-      backgroundColor: '#1e1e1e',
-      overflow: 'hidden'
+      backgroundColor: '#1e1e1e'
     }}>
       <div ref={terminalRef} style={{
         width: '100%',
         height: '100%',
-        minHeight: '300px',
-        overflow: 'hidden'
+        minHeight: '300px'
       }} />
     </div>
   )
