@@ -27,12 +27,13 @@ export class TerminalManager {
       })
 
       console.log(`Created terminal ${id} with shell: ${shell}`)
+      // Add exit handler
       ptyProcess.on('exit', () => console.log(`Terminal ${id} exited`))
 
       this.terminals.set(id, ptyProcess)
 
       // Send data from terminal to renderer
-      ptyProcess.onData(data => {
+      ptyProcess.on('data', data => {
         ipcMain.emit('terminal:data', id, data)
       })
 
