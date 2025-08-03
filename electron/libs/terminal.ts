@@ -11,13 +11,13 @@ export class TerminalManager {
   }
 
   private setupIpcHandlers() {
-    ipcMain.handle('terminal:create', () => {
+    ipcMain.handle('terminal:create', (_, { cols, rows }) => {
       const id = ++this.idCounter
       const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
       const ptyProcess = spawn(shell, [], {
         name: 'xterm-256color',
-        cols: 80,
-        rows: 30,
+        cols: cols || 80,
+        rows: rows || 30,
         cwd: process.env.HOME,
         env: process.env
       })

@@ -31,10 +31,17 @@ export default function TerminalComponent() {
 
     // Open terminal
     terminal.open(terminalRef.current)
+    
+    // Initial fit and get dimensions
     fitAddon.current.fit()
+    const initialCols = terminal.cols
+    const initialRows = terminal.rows
 
-    // Create terminal session
-    window.ipcRenderer.invoke('terminal:create').then((id) => {
+    // Create terminal session with initial dimensions
+    window.ipcRenderer.invoke('terminal:create', {
+      cols: initialCols,
+      rows: initialRows
+    }).then((id) => {
       terminalId.current = id
 
       // Handle data from terminal
@@ -51,19 +58,25 @@ export default function TerminalComponent() {
       })
 
       // Handle resize
-      // const resizeObserver = new ResizeObserver(() => {
-      //   if (fitAddon.current && terminalId.current) {
-      //     fitAddon.current.fit()
-      //     const { cols, rows } = terminal
-      //     window.ipcRenderer.invoke('terminal:resize', {
-      //       id: terminalId.current,
-      //       cols,
-      //       rows
-      //     })
-      //   }
-      // })
-      //
-      // resizeObserver.observe(terminalRef.current)
+      const resizeObserver = new ResizeObserver(() => {
+        if (fitAddon.current && terminalId.current) {
+          try {
+            fitAddon.current.fit()
+            const { cols, rows } = terminal
+            window.ipcRenderer.invoke('terminal:resize', {
+              id: terminalId.current,
+              cols,
+              rows
+            })
+          } catch (e) {
+            console.error('Resize error:', e)
+          }
+        }
+      })
+      
+      if (terminalRef.current) {
+        resizeObserver.observe(terminalRef.current)
+      }
 
       return () => {
         if (terminalId.current) {
