@@ -95,52 +95,10 @@ export default function TerminalComponent() {
         console.error('Terminal setup error:', e)
       }
     }, 100) // 100ms delay to ensure terminal is ready
-      terminalId.current = id
 
-      // Handle data from terminal
-      window.ipcRenderer.on('terminal:data', (_, data) => {
-        terminal.write(data)
-      })
-
-      // Handle input from user
-      terminal.onData((data) => {
-        window.ipcRenderer.invoke('terminal:write', {
-          id: terminalId.current,
-          data
-        })
-      })
-
-      // Handle resize
-      const resizeObserver = new ResizeObserver(() => {
-        if (fitAddon.current && terminalId.current) {
-          try {
-            fitAddon.current.fit()
-            const { cols, rows } = terminal
-            window.ipcRenderer.invoke('terminal:resize', {
-              id: terminalId.current,
-              cols,
-              rows
-            })
-          } catch (e) {
-            console.error('Resize error:', e)
-          }
-        }
-      })
-      
-      if (terminalRef.current) {
-        resizeObserver.observe(terminalRef.current)
-      }
-
-      return () => {
-        if (terminalId.current) {
-          window.ipcRenderer.invoke('terminal:destroy', terminalId.current)
-        }
-        resizeObserver.disconnect()
-      }
-    }).catch(err => {
-      console.error('Terminal initialization failed:', err)
-    })
-  }, 100) // 100ms delay to ensure terminal is ready
+    return () => {
+      terminal.dispose()
+    }
     return () => {
       terminal.dispose()
     }
