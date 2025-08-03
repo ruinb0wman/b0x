@@ -56,6 +56,13 @@ export default function TermCom() {
           terminalId.current = id
 
 
+          // Handle terminal output from backend
+          window.ipcRenderer.on('terminal:data', (event, { id, data }) => {
+            if (id === terminalId.current) {
+              terminal.write(data)
+            }
+          })
+
           // Handle input from user
           // Focus terminal when clicked
           terminalRef.current?.addEventListener('click', () => {
@@ -106,6 +113,7 @@ export default function TermCom() {
             if (terminalId.current) {
               window.ipcRenderer.invoke('terminal:destroy', terminalId.current)
             }
+            window.ipcRenderer.removeAllListeners('terminal:data')
             resizeObserver.disconnect()
           }
         }).catch(err => {
