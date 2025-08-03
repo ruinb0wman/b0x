@@ -33,12 +33,11 @@ export default function TerminalComponent() {
     terminal.open(terminalRef.current)
     
     // Initial fit right after opening
-    try {
-      if (!fitAddon.current) throw new Error('FitAddon not initialized')
-      
-      // Force a layout calculation
-      setTimeout(() => {
-        fitAddon.current?.fit()
+    setTimeout(() => {
+      try {
+        if (!fitAddon.current) throw new Error('FitAddon not initialized')
+        
+        fitAddon.current.fit()
         const initialCols = Math.max(terminal.cols || 80, 10)
         const initialRows = Math.max(terminal.rows || 24, 5)
 
@@ -71,15 +70,16 @@ export default function TerminalComponent() {
                 try {
                   fitAddon.current.fit()
                   const { cols, rows } = terminal
-                window.ipcRenderer.invoke('terminal:resize', {
-                  id: terminalId.current,
-                  cols,
-                  rows
-                })
-              } catch (e) {
-                console.error('Resize error:', e)
+                  window.ipcRenderer.invoke('terminal:resize', {
+                    id: terminalId.current,
+                    cols,
+                    rows
+                  })
+                } catch (e) {
+                  console.error('Resize error:', e)
+                }
               }
-            }
+            }, 100)
           })
           
           if (terminalRef.current) {
