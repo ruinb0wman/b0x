@@ -164,26 +164,26 @@ export default function TermCom() {
   }, [])
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
+    // <div style={{
+    //   display: 'flex',
+    //   flexDirection: 'column',
+    //   width: '100%',
+    //   height: '100%',
+    //   position: 'absolute',
+    //   top: 0,
+    //   left: 0,
+    //   right: 0,
+    //   bottom: 0,
+    //   padding: '8px',
+    //   boxSizing: 'border-box',
+    //   backgroundColor: '#1e1e1e'
+    // }}>
+    <div ref={terminalRef} style={{
       width: '100%',
       height: '100%',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      padding: '8px',
-      boxSizing: 'border-box',
-      backgroundColor: '#1e1e1e'
-    }}>
-      <div ref={terminalRef} style={{
-        width: '100%',
-        height: '100%',
-        minHeight: '300px',
-        overflow: 'hidden'
-      }} />
-    </div>
+      minHeight: '300px',
+      overflow: 'hidden'
+    }} />
+    // </div>
   )
 }
