@@ -30,7 +30,8 @@ let win: BrowserWindow | null
 
 function createWindow() {
   // Initialize terminal manager
-  new TerminalManager()
+  const terminalManager = new TerminalManager()
+  console.log('Terminal manager initialized')
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {

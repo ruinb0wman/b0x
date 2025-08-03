@@ -18,9 +18,16 @@ export class TerminalManager {
         name: 'xterm-256color',
         cols: cols || 80,
         rows: rows || 30,
-        cwd: process.env.HOME,
-        env: process.env
+        cwd: process.env.USERPROFILE || process.env.HOME,
+        env: {
+          ...process.env,
+          TERM: 'xterm-256color',
+          COLORTERM: 'truecolor'
+        }
       })
+
+      console.log(`Created terminal ${id} with shell: ${shell}`)
+      ptyProcess.on('exit', () => console.log(`Terminal ${id} exited`))
 
       this.terminals.set(id, ptyProcess)
 

@@ -47,15 +47,22 @@ export default function TerminalComponent() {
         const initialRows = Math.max(terminal.rows, 5)
 
         // Create terminal session with initial dimensions
+        console.log('Creating terminal with dimensions:', { cols: initialCols, rows: initialRows })
         window.ipcRenderer.invoke('terminal:create', {
           cols: initialCols,
           rows: initialRows
         }).then((id) => {
+          console.log('Terminal created with id:', id)
           terminalId.current = id
 
           // Handle data from terminal
           window.ipcRenderer.on('terminal:data', (_, data) => {
-            terminal.write(data)
+            console.log('Received data from terminal:', data)
+            try {
+              terminal.write(data)
+            } catch (e) {
+              console.error('Failed to write terminal data:', e)
+            }
           })
 
           // Handle input from user
@@ -65,10 +72,13 @@ export default function TerminalComponent() {
           })
 
           terminal.onData((data) => {
+            console.log('Sending data to terminal:', data)
             if (terminalId.current) {
               window.ipcRenderer.invoke('terminal:write', {
                 id: terminalId.current,
                 data
+              }).catch(err => {
+                console.error('Failed to write to terminal:', err)
               })
             }
           })
