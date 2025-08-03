@@ -16,18 +16,27 @@ export default function TermCom() {
     // Initialize terminal
     const terminal = new Terminal({
       cursorBlink: true,
-      fontFamily: '"Cascadia Code", "Courier New", "monospace"',
+      fontFamily: '"Cascadia Code", Menlo, Consolas, "DejaVu Sans Mono", "Courier New", monospace',
+      fontSize: 14,
+      fontWeight: 'normal',
+      fontWeightBold: 'bold',
+      allowTransparency: true,
       theme: {
         background: '#1e1e1e',
         foreground: '#ffffff'
-      }
+      },
+      allowProposedApi: true
     })
     terminalInstance.current = terminal
 
     // Addons
     fitAddon.current = new FitAddon()
     terminal.loadAddon(fitAddon.current)
-    terminal.loadAddon(new WebglAddon())
+    try {
+      terminal.loadAddon(new WebglAddon())
+    } catch (e) {
+      console.warn('WebGL addon could not be loaded, falling back to canvas renderer')
+    }
 
     // Open terminal
     terminal.open(terminalRef.current)
