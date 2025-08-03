@@ -18,32 +18,4 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
-
-  createTerminal: async (options: { cols: number; rows: number }) => {
-    try {
-      const { processId } = await ipcRenderer.invoke('createTerminal', options)
-      
-      return {
-        processId,
-        write: (data: string) => ipcRenderer.send('terminal-write', { processId, data }),
-        resize: (cols: number, rows: number) => ipcRenderer.send('terminal-resize', { processId, cols, rows }),
-        kill: () => ipcRenderer.send('terminal-kill', processId),
-        onData: (callback: (data: string) => void) => {
-          const channel = `terminal-data-${processId}`
-          const listener = (_, data: string) => callback(data)
-          ipcRenderer.on(channel, listener)
-          return () => ipcRenderer.off(channel, listener)
-        }
-      }
-    } catch (error) {
-      console.error('Terminal creation failed:', error)
-      return {
-        processId: 'fallback',
-        write: () => {},
-        resize: () => {},
-        kill: () => {},
-        onData: () => {}
-      }
-    }
-  },
 })
