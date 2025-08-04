@@ -28,11 +28,20 @@ export default function Tabs({ children }: { children: (tab: TabItem) => JSX.Ele
       <DragWrapper >
         <div>
           {tabs.map((_, index) => (
-            <Button type="primary" key={index} onClick={() => switchTab(index)}>
+            <Button 
+              type="primary" 
+              key={index} 
+              onClick={() => switchTab(index)}
+              style={{ WebkitAppRegion: 'no-drag' }}
+            >
               <UpCircleOutlined />
             </Button>
           ))}
-          <Button type="primary" onClick={addTab}>
+          <Button 
+            type="primary" 
+            onClick={addTab}
+            style={{ WebkitAppRegion: 'no-drag' }}
+          >
             <PlusCircleOutlined />
           </Button>
         </div>
