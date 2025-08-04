@@ -3,12 +3,13 @@ import TermCom from "../components/TermCom.tsx"
 import { Button } from 'antd'
 import { UpCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function TerminalPage() {
   const [tabs, setTabs] = useState([{ id: 0, show: false }]);
 
   function addTab() {
-    setTabs(tabs.concat({ id: tabs.length, show: false }))
+    setTabs(tabs.concat({ id: uuidv4(), show: false }))
   }
 
   function switchTab(index: number) {
