@@ -5,7 +5,7 @@ import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
 
 
-export default function TermCom() {
+function TermCom() {
   const terminalRef = useRef<HTMLDivElement>(null)
   const terminalInstance = useRef<Terminal | null>(null)
   const fitAddon = useRef<FitAddon | null>(null)
@@ -162,6 +162,11 @@ export default function TermCom() {
       terminal.dispose()
     }
   }, [])
+
+export default React.memo(TermCom, () => true);
+
+function TermCom() {
+  // ... existing code ...
 
   return (
     <div ref={terminalRef} style={{
