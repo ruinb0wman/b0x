@@ -4,10 +4,10 @@ import Tabs from "../components/Tabs.tsx"
 
 export default function TerminalPage() {
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Tabs>
         {(tab) => (
-          <div style={{ width: '100%', height: '100%', display: tab.show ? 'block' : 'none' }}>
+          <div style={{ width: '100%', height: '100%', visibility: tab.show ? 'visible' : 'hidden', position: tab.show ? 'relative' : 'absolute' }}>
             <TermCom key={tab.id} />
           </div>
         )}
