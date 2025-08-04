@@ -1,6 +1,6 @@
 import '@xterm/xterm/css/xterm.css'
-import TermCom from "@/components/TermCom.tsx"
-import Tabs from "@/components/Tabs.tsx"
+import TermCom from "../components/TermCom.tsx"
+import Tabs from "../components/Tabs.tsx"
 
 export default function TerminalPage() {
   return (

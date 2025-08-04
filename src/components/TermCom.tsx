@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, memo } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
@@ -163,11 +163,6 @@ function TermCom() {
     }
   }, [])
 
-export default React.memo(TermCom, () => true);
-
-function TermCom() {
-  // ... existing code ...
-
   return (
     <div ref={terminalRef} style={{
       width: '100%',
@@ -177,3 +172,4 @@ function TermCom() {
     }} />
   )
 }
+export default memo(TermCom)
