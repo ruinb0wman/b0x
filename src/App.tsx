@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/electron-vite.animate.svg';
-import './App.css';
-import { Outlet, Link } from 'react-router';
+import { Link } from 'react-router';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -32,7 +31,6 @@ function App() {
       <nav>
         <Link to="/terminal">Go to Terminal</Link>
       </nav>
-      <Outlet />
     </>
   )
 }
