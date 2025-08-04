@@ -2,6 +2,7 @@ import { Button } from 'antd'
 import { UpCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import DragWrapper from '@/components/DragWrapper'
 
 export interface TabItem {
   id: string;
@@ -24,16 +25,18 @@ export default function Tabs({ children }: { children: (tab: TabItem) => JSX.Ele
 
   return (
     <>
-      <div>
-        {tabs.map((_, index) => (
-          <Button type="primary" key={index} onClick={() => switchTab(index)}>
-            <UpCircleOutlined />
+      <DragWrapper >
+        <div>
+          {tabs.map((_, index) => (
+            <Button type="primary" key={index} onClick={() => switchTab(index)}>
+              <UpCircleOutlined />
+            </Button>
+          ))}
+          <Button type="primary" onClick={addTab}>
+            <PlusCircleOutlined />
           </Button>
-        ))}
-        <Button type="primary" onClick={addTab}>
-          <PlusCircleOutlined />
-        </Button>
-      </div>
+        </div>
+      </DragWrapper>
       {tabs.map((tab) => children(tab))}
     </>
   )
