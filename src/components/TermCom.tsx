@@ -117,11 +117,11 @@ function TermCom() {
           // Initial focus
           setTimeout(() => terminal.focus(), 200)
 
-          // Handle resize with debounce
-          let resizeTimeout: NodeJS.Timeout
+          // Handle resize with animation frame
+          let resizeRequest: number
           const resizeObserver = new ResizeObserver(() => {
-            clearTimeout(resizeTimeout)
-            resizeTimeout = setTimeout(() => {
+            cancelAnimationFrame(resizeRequest)
+            resizeRequest = requestAnimationFrame(() => {
               if (fitAddon.current && terminalId.current && terminalRef.current) {
                 try {
                   fitAddon.current.fit()
