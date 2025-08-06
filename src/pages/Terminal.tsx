@@ -1,5 +1,5 @@
 import '@xterm/xterm/css/xterm.css'
-import TermCom from "../components/TermCom.tsx"
+import TilingWM from "../components/TilingWM.tsx"
 import Tabs from "../components/Tabs.tsx"
 
 export default function TerminalPage() {
@@ -8,7 +8,7 @@ export default function TerminalPage() {
       <Tabs>
         {(tab) => (
           <div style={{ width: '100%', height: '100%', visibility: tab.show ? 'visible' : 'hidden', position: tab.show ? 'relative' : 'absolute' }}>
-            <TermCom key={tab.id} />
+            <TilingWM key={tab.id} />
           </div>
         )}
       </Tabs>

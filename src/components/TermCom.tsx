@@ -3,7 +3,7 @@ import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
-
+import config from "../config";
 
 function TermCom() {
   const terminalRef = useRef<HTMLDivElement>(null)
@@ -15,43 +15,19 @@ function TermCom() {
     if (!terminalRef.current) return
 
     // Initialize terminal
-    const terminal = new Terminal({
-      cursorBlink: true,
-      fontFamily: '"CaskaydiaCove Nerd Font Mono", "Courier New", monospace',
-      scrollback: 0,  // Disable scrollback buffer
-      scrollOnUserInput: false,  // Don't scroll on input
-      fontSize: 16,
-      fontWeight: 'normal',
-      fontWeightBold: 'bold',
-      allowTransparency: true,
-      theme: {
-        background: '#1a1b26',   // 背景色
-        foreground: '#c0caf5',   // 默认前景色（普通文字）
-        cursor: '#c0caf5',       // 光标颜色
-        cursorAccent: '#1a1b26', // 光标文字颜色
-        selectionBackground: '#33467c',    // 选中文本背景色
-
-        black: '#15161e',
-        red: '#f7768e',
-        green: '#9ece6a',
-        yellow: '#e0af68',
-        blue: '#7aa2f7',
-        magenta: '#bb9af7',
-        cyan: '#7dcfff',
-        white: '#a9b1d6',
-
-        brightBlack: '#414868',
-        brightRed: '#f7768e',
-        brightGreen: '#9ece6a',
-        brightYellow: '#e0af68',
-        brightBlue: '#7aa2f7',
-        brightMagenta: '#bb9af7',
-        brightCyan: '#7dcfff',
-        brightWhite: '#c0caf5',
-      },
-      allowProposedApi: true
-    })
+    const terminal = new Terminal(config.terminal)
+    terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
+      if (
+        event.ctrlKey &&
+        event.shiftKey &&
+        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
+      ) {
+        return false; // 阻止 xterm 处理，让事件冒泡
+      }
+      return true; // 允许 xterm 处理
+    });
     terminalInstance.current = terminal
+
 
     // Addons
     fitAddon.current = new FitAddon()
@@ -96,12 +72,6 @@ function TermCom() {
             }
           })
 
-          // Handle input from user
-          // Focus terminal when clicked
-          terminalRef.current?.addEventListener('click', () => {
-            terminal.focus()
-          })
-
           terminal.onData((data) => {
             console.log('Sending data to terminal:', data)
             if (terminalId.current) {
@@ -113,9 +83,6 @@ function TermCom() {
               })
             }
           })
-
-          // Initial focus
-          setTimeout(() => terminal.focus(), 200)
 
           // Handle resize with animation frame
           let resizeRequest: number
@@ -135,7 +102,7 @@ function TermCom() {
                   console.error('Resize error:', e)
                 }
               }
-            }, 100)
+            })
           })
 
           if (terminalRef.current) {

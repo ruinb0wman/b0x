@@ -26,7 +26,7 @@ export function usePty() {
 
       // Send data from terminal to renderer
       ptyProcess.on('data', data => {
-        console.log('[pty:send terminal:data]', ptyProcess.pid, data)
+        // console.log('[pty:send terminal:data]', ptyProcess.pid, data)
         win.webContents.send('terminal:data', {
           id: ptyProcess.pid,
           data
@@ -39,7 +39,7 @@ export function usePty() {
 
     // handle write data to pty
     ipcMain.handle('terminal:write', (_, { id, data }) => {
-      console.log('get message from xterm', id, data)
+      // console.log('get message from xterm', id, data)
       const pty = ptys.get(id)
       pty?.write(data)
     })
