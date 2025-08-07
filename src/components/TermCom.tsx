@@ -1,20 +1,30 @@
-import { useEffect, useRef, memo } from 'react'
+import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
-import config from "../config";
+import config from '../config'
 
-function TermCom() {
+// 👇 全局缓存：termId -> 后端 terminal id
+const TerminalSessionCache = new Map<string, number>()
+
+interface Props {
+  termId: string
+}
+
+export default function TermCom({ termId }: Props) {
   const terminalRef = useRef<HTMLDivElement>(null)
   const terminalInstance = useRef<Terminal | null>(null)
   const fitAddon = useRef<FitAddon | null>(null)
-  const terminalId = useRef<number | null>(null)
+  const resizeObserver = useRef<ResizeObserver | null>(null)
+  console.log('TerminalSessionCache', TerminalSessionCache);
 
   useEffect(() => {
     if (!terminalRef.current) return
 
-    // Initialize terminal
+    const container = terminalRef.current
+
+    // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
     terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
       if (
@@ -22,121 +32,151 @@ function TermCom() {
         event.shiftKey &&
         ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
       ) {
-        return false; // 阻止 xterm 处理，让事件冒泡
+        return false
       }
-      return true; // 允许 xterm 处理
-    });
+      return true
+    })
     terminalInstance.current = terminal
 
+    // 添加插件
+    const fitAddonInstance = new FitAddon()
+    terminal.loadAddon(fitAddonInstance)
+    fitAddon.current = fitAddonInstance
 
-    // Addons
-    fitAddon.current = new FitAddon()
-    terminal.loadAddon(fitAddon.current)
     try {
       terminal.loadAddon(new WebglAddon())
     } catch (e) {
       console.warn('WebGL addon could not be loaded, falling back to canvas renderer')
     }
 
-    // Open terminal
-    terminal.open(terminalRef.current)
+    // 打开 terminal
+    terminal.open(container)
 
-    // Force layout calculation before fitting
+    // 强制布局
     const timeout = setTimeout(() => {
-      try {
-        if (!fitAddon.current) throw new Error('FitAddon not initialized')
+      if (!container || !fitAddon.current) return
+      container.clientWidth
+      container.clientHeight
+      fitAddon.current.fit()
 
-        // Force a layout pass
-        terminalRef.current?.clientWidth
-        terminalRef.current?.clientHeight
+      const initialCols = Math.max(terminal.cols, 10)
+      const initialRows = Math.max(terminal.rows, 5)
 
-        // Fit terminal to container
-        fitAddon.current.fit()
-        const initialCols = Math.max(terminal.cols, 10)
-        const initialRows = Math.max(terminal.rows, 5)
+      let backendId: number
+      let isReconnected = false
 
-        // Create terminal session with initial dimensions
-        console.log('Creating terminal with dimensions:', { cols: initialCols, rows: initialRows })
-        window.ipcRenderer.invoke('terminal:create', {
-          cols: initialCols,
-          rows: initialRows
-        }).then((id) => {
-          console.log('Terminal created with id:', id)
-          terminalId.current = id
-
-          // Handle terminal output from backend
-          window.ipcRenderer.on('terminal:data', (_: any, dataObj: any) => {
-            console.log('terminal:data', dataObj)
-            if (dataObj.id === terminalId.current) {
-              terminal.write(dataObj.data)
-            }
+      // 🔍 检查是否已有该 termId 的 backend session
+      if (TerminalSessionCache.has(termId)) {
+        backendId = TerminalSessionCache.get(termId)!
+        isReconnected = true
+        console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
+      } else {
+        // 🆕 创建新终端
+        window.ipcRenderer
+          .invoke('terminal:create', { cols: initialCols, rows: initialRows })
+          .then((id: number) => {
+            console.log(`New terminal created for termId: ${termId}, backendId: ${id}`)
+            TerminalSessionCache.set(termId, id)
+            backendId = id
+            // 继续后续绑定
+            bindTerminalEvents(terminal, id)
           })
-
-          terminal.onData((data) => {
-            console.log('Sending data to terminal:', data)
-            if (terminalId.current) {
-              window.ipcRenderer.invoke('terminal:write', {
-                id: terminalId.current,
-                data
-              }).catch(err => {
-                console.error('Failed to write to terminal:', err)
-              })
-            }
+          .catch((err: any) => {
+            console.error('Failed to create terminal:', err)
           })
-
-          // Handle resize with animation frame
-          let resizeRequest: number
-          const resizeObserver = new ResizeObserver(() => {
-            cancelAnimationFrame(resizeRequest)
-            resizeRequest = requestAnimationFrame(() => {
-              if (fitAddon.current && terminalId.current && terminalRef.current) {
-                try {
-                  fitAddon.current.fit()
-                  const { cols, rows } = terminal
-                  window.ipcRenderer.invoke('terminal:resize', {
-                    id: terminalId.current,
-                    cols,
-                    rows
-                  })
-                } catch (e) {
-                  console.error('Resize error:', e)
-                }
-              }
-            })
-          })
-
-          if (terminalRef.current) {
-            resizeObserver.observe(terminalRef.current)
-          }
-
-          return () => {
-            if (terminalId.current) {
-              window.ipcRenderer.invoke('terminal:destroy', terminalId.current)
-            }
-            window.ipcRenderer.removeAllListeners('terminal:data')
-            resizeObserver.disconnect()
-          }
-        }).catch(err => {
-          console.error('Terminal initialization failed:', err)
-        })
-      } catch (e) {
-        console.error('Terminal setup error:', e)
+        return
       }
-    }, 100) // 100ms delay to ensure terminal is ready
 
-    return () => {
-      clearTimeout(timeout)
-      terminal.dispose()
+      // 如果是重连，立即绑定事件
+      bindTerminalEvents(terminal, backendId)
+
+      // 强制重新 fit（可选）
+      if (isReconnected) {
+        setTimeout(() => {
+          fitAddon.current?.fit()
+          const { cols, rows } = terminal
+          window.ipcRenderer.invoke('terminal:resize', { id: backendId, cols, rows }).catch(console.error)
+        }, 50)
+      }
+    }, 100)
+
+    // 绑定事件的函数（可复用）
+    function bindTerminalEvents(terminal: Terminal, id: number) {
+      // 监听后端输出
+      const onData = (_: any, dataObj: any) => {
+        if (dataObj.id === id && terminalInstance.current) {
+          terminalInstance.current.write(dataObj.data)
+        }
+      }
+      window.ipcRenderer.on('terminal:data', onData)
+
+      // 监听用户输入
+      const onTerminalData = (data: string) => {
+        window.ipcRenderer.invoke('terminal:write', { id, data }).catch((err) => {
+          console.error('Failed to write to terminal:', err)
+        })
+      }
+      terminal.onData(onTerminalData)
+
+      // 监听 resize
+      let resizeRequest: number
+      const ro = new ResizeObserver(() => {
+        cancelAnimationFrame(resizeRequest)
+        resizeRequest = requestAnimationFrame(() => {
+          if (fitAddon.current && container && terminalInstance.current) {
+            try {
+              fitAddon.current.fit()
+              const { cols, rows } = terminal
+              window.ipcRenderer.invoke('terminal:resize', { id, cols, rows })
+            } catch (e) {
+              console.error('Resize error:', e)
+            }
+          }
+        })
+      })
+      ro.observe(container)
+      resizeObserver.current = ro
+
+      // 清理函数
+      const cleanup = () => {
+        // window.ipcRenderer.removeAllListeners('terminal:data')
+        // terminal?.offData(onTerminalData)
+        window.ipcRenderer.off('terminal:data', onData)
+        ro.disconnect()
+        // 注意：不 destroy backend，除非显式关闭 pane
+      }
+
+        // 存储 cleanup 函数以便销毁时调用
+        ; (terminal as any)._cleanup = cleanup
     }
-  }, [])
+
+    // 💥 组件卸载时清理
+    return () => {
+      clearTimeout(timeout);
+      if (terminalInstance.current) {
+        // 调用 cleanup
+        ; (terminalInstance.current as any)._cleanup?.()
+        terminalInstance.current.dispose()
+      }
+      if (resizeObserver.current) {
+        resizeObserver.current.disconnect()
+      }
+      // 🔴 注意：不要在这里 destroy backend，除非你确定要关闭终端
+      // 如果是布局重排，应该保留 backend session
+      // 后端销毁应由显式“关闭 tab”操作触发，比如发送 'terminal:destroy'
+    }
+  }, [termId]) // 依赖 termId：切换 pane 时重建
 
   return (
-    <div ref={terminalRef} style={{
-      width: '100%',
-      height: '100%',
-      minHeight: '300px',
-      overflow: 'hidden'
-    }} />
+    <div
+      ref={terminalRef}
+      style={{
+        width: '100%',
+        height: '100%',
+        minHeight: '300px',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+    />
   )
 }
-export default memo(TermCom)

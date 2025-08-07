@@ -1,17 +1,19 @@
-import '@xterm/xterm/css/xterm.css'
-import TilingWM from "../components/TilingWM.tsx"
-import Tabs from "../components/Tabs.tsx"
+import DragWrapper from "../components/DragWrapper";
+import { TilingWMProvider } from '../components/TilingWM/TilingWMProvider';
+import TilingWM from '../components/TilingWM/TilingWM';
+import TermCom from "@/components/TermCom";
 
-export default function TerminalPage() {
+export default function App() {
+  const renderPaneContent = (termId: string) => <TermCom termId={termId} />;
+
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Tabs>
-        {(tab) => (
-          <div style={{ width: '100%', height: '100%', visibility: tab.show ? 'visible' : 'hidden', position: tab.show ? 'relative' : 'absolute' }}>
-            <TilingWM key={tab.id} />
-          </div>
-        )}
-      </Tabs>
+    <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', }}>
+      <DragWrapper>
+        <div style={{ width: '100vw', height: '5px' }}></div>
+      </DragWrapper>
+      <TilingWMProvider>
+        <TilingWM renderPaneContent={renderPaneContent} />
+      </TilingWMProvider>
     </div>
-  )
+  );
 }
