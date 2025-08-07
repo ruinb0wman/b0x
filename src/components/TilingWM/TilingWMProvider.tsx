@@ -16,6 +16,8 @@ interface PaneNode {
   type: NodeType;
   children: PaneNode[];
   termId: string | null; // 指向 Term 的 ID
+  flex: number | null;
+  parent: PaneNode | null;
 }
 
 interface TilingWMState {
@@ -27,7 +29,8 @@ interface TilingWMState {
 type TilingWMAction =
   | { type: 'ATTACH_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
   | { type: 'SET_ACTIVE_PANE'; paneId: string }
-  | { type: 'UPDATE_TERM_COUNT'; termId: string; count: number };
+  | { type: 'UPDATE_TERM_COUNT'; termId: string; count: number }
+  | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' };
 
 // === Context 定义 ===
 const TilingWMContext = createContext<{
@@ -40,12 +43,14 @@ function createTerm(): TermInstance {
   return { id: uuidV4(), count: 0 };
 }
 
-function createPane(termId: string | null = null): PaneNode {
+function createPane(termId: string | null = null, parent?: PaneNode): PaneNode {
   return {
     id: uuidV4(),
     type: 'Leaf' as const,
     children: [],
     termId,
+    flex: null,
+    parent: parent || null
   };
 }
 
@@ -78,18 +83,18 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
         // 添加新终端
         draft.terms[newTerm.id] = newTerm;
 
-        const newType: NodeType = direction === 'left' || direction === 'right' ? 'Vertical' : 'Horizon';
+        const newType: NodeType = direction === 'left' || direction === 'right' ? 'Horizon' : 'Vertical';
 
         function findAndAttach(node: PaneNode): boolean {
           if (node.type === 'Leaf' && node.id === targetId) {
             node.type = newType;
-            const copyPane = createPane(node.termId);
+            const copyPane = createPane(node.termId, node);
             node.termId = null;
 
             node.children =
               direction === 'left' || direction === 'up'
-                ? [{ ...createPane(newTerm.id), id: newPaneId }, copyPane]
-                : [copyPane, { ...createPane(newTerm.id), id: newPaneId }];
+                ? [{ ...createPane(newTerm.id, node), id: newPaneId }, copyPane]
+                : [copyPane, { ...createPane(newTerm.id, node), id: newPaneId }];
 
             return true;
           }
@@ -101,6 +106,50 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
 
         findAndAttach(draft.rootPane);
         draft.activePaneId = newPaneId;
+        break;
+      }
+
+      case 'RESIZE_PANE': {
+        const { targetId, direction } = action;
+        console.log('RESIZE_PANE', targetId, direction);
+
+        function findAndResize(node: PaneNode, parent?: PaneNode): boolean {
+          if (node.type === 'Leaf' && node.id === targetId && parent) {
+            if (direction == 'up') {
+              if (parent.type == 'Vertical') {
+                parent.children[0].flex = (parent.children[0].flex || 1) - 0.1;
+              } else if (parent.type == 'Horizon' && parent.parent?.type == 'Vertical') {
+                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) - 0.1;
+              }
+            } else if (direction == 'down') {
+              if (parent.type == 'Vertical') {
+                parent.children[0].flex = (parent.children[0].flex || 1) + 0.1;
+              } else if (parent.type == 'Horizon' && parent.parent?.type == 'Vertical') {
+                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
+              }
+            } else if (direction == 'left') {
+              if (parent.type == 'Horizon') {
+                parent.children[0].flex = (parent.children[0].flex || 1) - 0.1;
+              } else if (parent.type == 'Vertical' && parent.parent?.type == 'Horizon') {
+                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) - 0.1;
+              }
+            } else if (direction == 'right') {
+              if (parent.type == 'Horizon') {
+                parent.children[0].flex = (parent.children[0].flex || 1) + 0.1;
+              } else if (parent.type == 'Vertical' && parent.parent?.type == 'Horizon') {
+                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
+              }
+            }
+
+            return true;
+          }
+          for (const child of node.children) {
+            if (findAndResize(child, node)) return true;
+          }
+          return false;
+        }
+
+        findAndResize(draft.rootPane);
         break;
       }
     }

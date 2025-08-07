@@ -12,18 +12,25 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
   // 键盘事件监听
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!state.activePaneId || !e.ctrlKey || !e.shiftKey) return;
-
-      e.preventDefault();
+      if (!state.activePaneId) return;
       const directionMap: Record<string, 'left' | 'right' | 'up' | 'down'> = {
         ArrowLeft: 'left',
         ArrowRight: 'right',
         ArrowUp: 'up',
         ArrowDown: 'down',
       };
-      const dir = directionMap[e.key];
-      if (dir) {
-        dispatch({ type: 'ATTACH_PANE', targetId: state.activePaneId, direction: dir });
+      if (e.ctrlKey && e.shiftKey) {
+        e.preventDefault();
+        const dir = directionMap[e.key];
+        if (dir) {
+          dispatch({ type: 'ATTACH_PANE', targetId: state.activePaneId, direction: dir });
+        }
+      } else if (e.altKey && e.shiftKey) {
+        e.preventDefault();
+        const dir = directionMap[e.key];
+        if (dir) {
+          dispatch({ type: 'RESIZE_PANE', targetId: state.activePaneId, direction: dir });
+        }
       }
     };
 
@@ -40,7 +47,9 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
           key={pane.id}
           onClick={() => handlePaneClick(pane.id)}
           style={{
-            flex: 1,
+            width: '100%',
+            height: '100%',
+            flex: pane.flex || 1,
             boxSizing: 'border-box',
             display: 'flex',
             alignItems: 'center',
@@ -48,11 +57,10 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
             position: 'relative',
             padding: "5px",
             backgroundColor: '#1a1b26',
-            width: '100%',
-            height: '100%',
           }}
         >
-          <div style={{ width: '100%', height: '100%', boxShadow: isActive ? '0 0 0 2px #7aa2f7' : '0 0 0 2px #ddd', zIndex: isActive ? 1 : 0, position: 'absolute' }}>
+          {/* 从文档流中移出,确保置顶,从而能正常显示boxShadow */}
+          <div style={{ top: 0, left: 0, right: 0, bottom: 0, boxShadow: isActive ? '0 0 0 2px #7aa2f7' : '0 0 0 2px #ddd', zIndex: isActive ? 1 : 0, position: 'absolute' }}>
             {pane.termId ? renderPaneContent(pane.termId) : null}
           </div>
         </div>
@@ -64,11 +72,11 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
         key={pane.id}
         style={{
           display: 'flex',
-          flexDirection: pane.type === 'Vertical' ? 'row' : 'column',
-          flex: 1,
+          flexDirection: pane.type === 'Vertical' ? 'column' : 'row',
           width: '100%',
           height: '100%',
-          gap: 2
+          gap: 2,
+          flex: pane.flex || 1
         }}
       >
         {pane.children.map(renderPane)}

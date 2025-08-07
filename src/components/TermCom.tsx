@@ -28,7 +28,7 @@ export default function TermCom({ termId }: Props) {
     const terminal = new Terminal(config.terminal)
     terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
       if (
-        event.ctrlKey &&
+        (event.ctrlKey || event.altKey) &&
         event.shiftKey &&
         ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
       ) {
