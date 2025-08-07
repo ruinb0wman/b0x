@@ -58,6 +58,7 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
             padding: "5px",
             backgroundColor: '#1a1b26',
           }}
+          data-id={pane.id}
         >
           {/* 从文档流中移出,确保置顶,从而能正常显示boxShadow */}
           <div style={{ top: 0, left: 0, right: 0, bottom: 0, boxShadow: isActive ? '0 0 0 2px #7aa2f7' : '0 0 0 2px #ddd', zIndex: isActive ? 1 : 0, position: 'absolute' }}>
@@ -78,6 +79,7 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
           gap: 2,
           flex: pane.flex || 1
         }}
+        data-id={pane.id}
       >
         {pane.children.map(renderPane)}
       </div>

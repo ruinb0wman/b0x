@@ -1,6 +1,6 @@
 // TilingWMProvider.tsx
-import { createContext, useContext, useReducer, ReactNode, useState } from 'react';
-import { produce } from 'immer';
+import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { produce, current } from 'immer';
 import { v4 as uuidV4 } from 'uuid';
 
 // === 类型定义 ===
@@ -110,7 +110,7 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
       }
 
       case 'RESIZE_PANE': {
-        const { targetId, direction } = action;
+        let { targetId, direction } = action;
         console.log('RESIZE_PANE', targetId, direction);
 
         function findAndResize(node: PaneNode, parent?: PaneNode): boolean {
@@ -119,34 +119,46 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
               if (parent.type == 'Vertical') {
                 parent.children[0].flex = (parent.children[0].flex || 1) - 0.1;
               } else if (parent.type == 'Horizon' && parent.parent?.type == 'Vertical') {
-                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) - 0.1;
+                // immer 无法追踪到grandparent所以这里修改targetId后重新执行递归
+                targetId = parent.parent.children[0].id;
+                return findAndResize(draft.rootPane);
               }
             } else if (direction == 'down') {
               if (parent.type == 'Vertical') {
                 parent.children[0].flex = (parent.children[0].flex || 1) + 0.1;
               } else if (parent.type == 'Horizon' && parent.parent?.type == 'Vertical') {
-                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
+                // parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
+                targetId = parent.parent.children[0].id;
+                return findAndResize(draft.rootPane);
               }
             } else if (direction == 'left') {
               if (parent.type == 'Horizon') {
                 parent.children[0].flex = (parent.children[0].flex || 1) - 0.1;
               } else if (parent.type == 'Vertical' && parent.parent?.type == 'Horizon') {
-                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) - 0.1;
+                // parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) - 0.1;
+                targetId = parent.parent.children[0].id;
+                return findAndResize(draft.rootPane);
               }
             } else if (direction == 'right') {
               if (parent.type == 'Horizon') {
                 parent.children[0].flex = (parent.children[0].flex || 1) + 0.1;
               } else if (parent.type == 'Vertical' && parent.parent?.type == 'Horizon') {
-                parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
+                // parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
+                targetId = parent.parent.children[0].id;
+                return findAndResize(draft.rootPane);
               }
             }
 
             return true;
           }
+
           for (const child of node.children) {
             if (findAndResize(child, node)) return true;
           }
           return false;
+        }
+
+        function findAndResizeGrandparent() {
         }
 
         findAndResize(draft.rootPane);
