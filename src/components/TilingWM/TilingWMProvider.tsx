@@ -8,7 +8,6 @@ const rootPane = createPane(initialTerm.id, null);
 const initialState: Terminal.TilingWMState = {
   panes: { [rootPane.id]: rootPane },
   rootPaneId: rootPane.id,
-  terms: { [initialTerm.id]: initialTerm },
   activePaneId: null,
 };
 
@@ -23,12 +22,6 @@ function tilingWMReducer(state: Terminal.TilingWMState, action: Terminal.TilingW
     switch (action.type) {
       case 'SET_ACTIVE_PANE':
         draft.activePaneId = action.paneId;
-        break;
-
-      case 'UPDATE_TERM_COUNT':
-        if (draft.terms[action.termId]) {
-          draft.terms[action.termId].count = action.count;
-        }
         break;
 
       case 'ATTACH_PANE': {

@@ -25,7 +25,6 @@ export function attachPane(draft: WritableDraft<Terminal.TilingWMState>, action:
 
   const newTerm = createTerm();
   const newPane = createPane(newTerm.id);
-  draft.terms[newTerm.id] = newTerm;
 
   const newType: Terminal.NodeType = direction === 'left' || direction === 'right' ? 'Horizon' : 'Vertical';
 
@@ -86,16 +85,12 @@ export function resizePane(draft: WritableDraft<Terminal.TilingWMState>, action:
 }
 
 export function closePane(draft: WritableDraft<Terminal.TilingWMState>, action: Terminal.TilingWMAction) {
+  console.log('closePane', draft, action);
   if (action.type != 'CLOSE_PANE') return;
   const { targetId } = action;
   const targetPane = draft.panes[targetId];
   // 找不到pane或者pane是根节点则退出
   if (!targetPane || !targetPane.parentId) return;
-
-  // Remove associated term if any
-  if (targetPane.termId && draft.terms[targetPane.termId]) {
-    delete draft.terms[targetPane.termId];
-  }
 
   const parent = draft.panes[targetPane.parentId];
   if (!parent) return;

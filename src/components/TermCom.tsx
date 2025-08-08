@@ -32,6 +32,8 @@ export default function TermCom({ termId }: Props) {
         ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
       ) {
         return false
+      } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
+        return false;
       }
       return true
     })

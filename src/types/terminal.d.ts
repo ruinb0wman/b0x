@@ -26,14 +26,12 @@ declare namespace Terminal {
   interface TilingWMState {
     panes: Record<string, PaneNode>; // 扁平化存储所有Pane
     rootPaneId: string;              // 根Pane ID
-    terms: Record<string, TermInstance>;
     activePaneId: string | null;
   }
 
   type TilingWMAction =
     | { type: 'ATTACH_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
     | { type: 'SET_ACTIVE_PANE'; paneId: string }
-    | { type: 'UPDATE_TERM_COUNT'; termId: string; count: number }
     | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
     | { type: 'CLOSE_PANE'; targetId: string };
 }
