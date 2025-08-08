@@ -12,6 +12,7 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
   // 键盘事件监听
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      console.log('key', e);
       if (!state.activePaneId) return;
       const directionMap: Record<string, 'left' | 'right' | 'up' | 'down'> = {
         ArrowLeft: 'left',
@@ -31,6 +32,10 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
         if (dir) {
           dispatch({ type: 'RESIZE_PANE', targetId: state.activePaneId, direction: dir });
         }
+      } else if (e.ctrlKey && e.key === 'w') {
+        console.log('try close')
+        e.preventDefault();
+        dispatch({ type: 'CLOSE_PANE', targetId: state.activePaneId });
       }
     };
 
