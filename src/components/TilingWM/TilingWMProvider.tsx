@@ -1,14 +1,13 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { produce } from 'immer';
 import { v4 as uuidV4 } from 'uuid';
-// Removed: import { Terminal } from '../../types/terminal'; // This line is no longer needed for Terminal namespace
 
 // === 类型定义 ===
 // Now Terminal is globally available
 type TermInstance = Terminal.TermInstance;
 type NodeType = Terminal.NodeType;
-interface PaneNode extends Terminal.PaneNode {}
-interface TilingWMState extends Terminal.TilingWMState {}
+interface PaneNode extends Terminal.PaneNode { }
+interface TilingWMState extends Terminal.TilingWMState { }
 type TilingWMAction = Terminal.TilingWMAction;
 
 // === Context 定义 ===
