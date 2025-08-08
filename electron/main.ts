@@ -28,17 +28,18 @@ function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
-      devTools: true
+      devTools: true,
+      enableRemoteModule: false,
+      contextIsolation: true,
+      nodeIntegration: false
     },
   })
 
 
-  // Handle Ctrl+W to close pane instead of window
+  // Disable default Ctrl+W behavior (close window)
   win.webContents.on('before-input-event', (event, input) => {
     if (input.control && input.key.toLowerCase() === 'w') {
       event.preventDefault()
-      // Send message to renderer to close pane
-      win?.webContents.send('close-pane')
     }
   })
 
