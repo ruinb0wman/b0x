@@ -112,61 +112,50 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
         break;
       }
 
+
       case 'RESIZE_PANE': {
         const { targetId, direction } = action;
-        let currentId = targetId;
 
-        function resize(id: string): boolean {
-          const pane = draft.panes[id];
-          if (!pane) return false;
+        // 查找需要修改 flex 的容器类型
+        const targetLayout: NodeType =
+          direction === 'left' || direction === 'right'
+            ? 'Horizon'
+            : 'Vertical';
 
-          const parent = pane.parentId ? draft.panes[pane.parentId] : null;
-          if (pane.type === 'Leaf' && parent) {
-            if (direction === 'up') {
-              if (parent.type === 'Vertical') {
-                parent.childrenId.forEach((cid, idx) => {
-                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) - 0.1;
-                });
-              } else if (parent.type === 'Horizon' && parent.parentId) {
-                currentId = draft.panes[parent.parentId].childrenId[0];
-                return resize(currentId);
-              }
-            } else if (direction === 'down') {
-              if (parent.type === 'Vertical') {
-                parent.childrenId.forEach((cid, idx) => {
-                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) + 0.1;
-                });
-              } else if (parent.type === 'Horizon' && parent.parentId) {
-                currentId = draft.panes[parent.parentId].childrenId[0];
-                return resize(currentId);
-              }
-            } else if (direction === 'left') {
-              if (parent.type === 'Horizon') {
-                parent.childrenId.forEach((cid, idx) => {
-                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) - 0.1;
-                });
-              } else if (parent.type === 'Vertical' && parent.parentId) {
-                currentId = draft.panes[parent.parentId].childrenId[0];
-                return resize(currentId);
-              }
-            } else if (direction === 'right') {
-              if (parent.type === 'Horizon') {
-                parent.childrenId.forEach((cid, idx) => {
-                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) + 0.1;
-                });
-              } else if (parent.type === 'Vertical' && parent.parentId) {
-                currentId = draft.panes[parent.parentId].childrenId[0];
-                return resize(currentId);
-              }
+        // flex 调整值（左右/上下的 +/-）
+        const delta =
+          direction === 'left' || direction === 'up'
+            ? -0.1
+            : 0.1;
+
+        // 从 targetId 向上找合适的父节点
+        let currentId: string | null = targetId;
+        while (currentId) {
+          const pane = draft.panes[currentId] as PaneNode | undefined;
+          if (!pane) break;
+          const parentId = pane.parentId;
+          if (!parentId) break; // 到根节点还没找到
+
+          const parent = draft.panes[parentId];
+          if (!parent) break;
+
+          if (parent.type === targetLayout) {
+            // 修改第一个子 Pane 的 flex
+            const firstChildId = parent.childrenId[0];
+            if (firstChildId) {
+              draft.panes[firstChildId].flex =
+                (draft.panes[firstChildId].flex || 1) + delta;
             }
-            return true;
+            break; // 找到就结束
           }
-          return pane.childrenId.some(cid => resize(cid));
+
+          // 否则继续往上找
+          currentId = parentId;
         }
 
-        resize(currentId);
         break;
       }
+
     }
   });
 }
