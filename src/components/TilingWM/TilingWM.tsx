@@ -36,10 +36,13 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.activePaneId]);
+  }, [state.activePaneId, dispatch]);
 
-  // 渲染 Pane 树
-  const renderPane = (pane: any) => {
+  // 递归渲染 Pane
+  const renderPane = (paneId: string): React.ReactNode => {
+    const pane = state.panes[paneId];
+    if (!pane) return null;
+
     if (pane.type === 'Leaf') {
       const isActive = state.activePaneId === pane.id;
       return (
@@ -60,8 +63,17 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
           }}
           data-id={pane.id}
         >
-          {/* 从文档流中移出,确保置顶,从而能正常显示boxShadow */}
-          <div style={{ top: 0, left: 0, right: 0, bottom: 0, boxShadow: isActive ? '0 0 0 2px #7aa2f7' : '0 0 0 2px #ddd', zIndex: isActive ? 1 : 0, position: 'absolute' }}>
+          <div
+            style={{
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              boxShadow: isActive ? '0 0 0 2px #7aa2f7' : '0 0 0 2px #ddd',
+              zIndex: isActive ? 1 : 0,
+              position: 'absolute'
+            }}
+          >
             {pane.termId ? renderPaneContent(pane.termId) : null}
           </div>
         </div>
@@ -81,14 +93,15 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
         }}
         data-id={pane.id}
       >
-        {pane.children.map(renderPane)}
+        {pane.childrenId.map(childId => renderPane(childId))}
       </div>
     );
   };
 
   return (
     <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {renderPane(state.rootPane)}
+      {renderPane(state.rootPaneId)}
     </div>
   );
 }
+

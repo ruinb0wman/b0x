@@ -1,6 +1,6 @@
 // TilingWMProvider.tsx
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-import { produce, current } from 'immer';
+import { produce } from 'immer';
 import { v4 as uuidV4 } from 'uuid';
 
 // === 类型定义 ===
@@ -14,14 +14,15 @@ type NodeType = 'Leaf' | 'Vertical' | 'Horizon';
 interface PaneNode {
   id: string;
   type: NodeType;
-  children: PaneNode[];
-  termId: string | null; // 指向 Term 的 ID
+  childrenId: string[];     // 子节点ID数组
+  termId: string | null;    // 指向 Term 的 ID
   flex: number | null;
-  parent: PaneNode | null;
+  parentId: string | null;  // 父节点ID
 }
 
 interface TilingWMState {
-  rootPane: PaneNode;
+  panes: Record<string, PaneNode>; // 扁平化存储所有Pane
+  rootPaneId: string;              // 根Pane ID
   terms: Record<string, TermInstance>;
   activePaneId: string | null;
 }
@@ -43,21 +44,24 @@ function createTerm(): TermInstance {
   return { id: uuidV4(), count: 0 };
 }
 
-function createPane(termId: string | null = null, parent?: PaneNode): PaneNode {
+function createPane(termId: string | null = null, parentId: string | null = null): PaneNode {
   return {
     id: uuidV4(),
-    type: 'Leaf' as const,
-    children: [],
+    type: 'Leaf',
+    childrenId: [],
     termId,
     flex: null,
-    parent: parent || null
+    parentId
   };
 }
 
 const initialTerm = createTerm();
+const rootPane = createPane(initialTerm.id, null);
+
 const initialState: TilingWMState = {
+  panes: { [rootPane.id]: rootPane },
+  rootPaneId: rootPane.id,
   terms: { [initialTerm.id]: initialTerm },
-  rootPane: createPane(initialTerm.id),
   activePaneId: null,
 };
 
@@ -77,91 +81,90 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
 
       case 'ATTACH_PANE': {
         const { targetId, direction } = action;
-        const newTerm = createTerm();
-        const newPaneId = uuidV4();
+        const targetPane = draft.panes[targetId];
+        if (!targetPane) return;
 
-        // 添加新终端
+        const newTerm = createTerm();
+        const newPane = createPane(newTerm.id);
         draft.terms[newTerm.id] = newTerm;
 
         const newType: NodeType = direction === 'left' || direction === 'right' ? 'Horizon' : 'Vertical';
 
-        function findAndAttach(node: PaneNode): boolean {
-          if (node.type === 'Leaf' && node.id === targetId) {
-            node.type = newType;
-            const copyPane = createPane(node.termId, node);
-            node.termId = null;
+        // 转换 targetPane 为容器
+        targetPane.type = newType;
+        const copyPane = createPane(targetPane.termId, targetPane.id);
+        const copyId = copyPane.id;
+        draft.panes[copyId] = copyPane;
 
-            node.children =
-              direction === 'left' || direction === 'up'
-                ? [{ ...createPane(newTerm.id, node), id: newPaneId }, copyPane]
-                : [copyPane, { ...createPane(newTerm.id, node), id: newPaneId }];
+        targetPane.termId = null;
 
-            return true;
-          }
-          for (const child of node.children) {
-            if (findAndAttach(child)) return true;
-          }
-          return false;
-        }
+        // 创建新Pane
+        newPane.parentId = targetPane.id;
+        draft.panes[newPane.id] = newPane;
 
-        findAndAttach(draft.rootPane);
-        draft.activePaneId = newPaneId;
+        // 排列顺序
+        targetPane.childrenId =
+          direction === 'left' || direction === 'up'
+            ? [newPane.id, copyId]
+            : [copyId, newPane.id];
+
+        draft.activePaneId = newPane.id;
         break;
       }
 
       case 'RESIZE_PANE': {
-        let { targetId, direction } = action;
-        console.log('RESIZE_PANE', targetId, direction);
+        const { targetId, direction } = action;
+        let currentId = targetId;
 
-        function findAndResize(node: PaneNode, parent?: PaneNode): boolean {
-          if (node.type === 'Leaf' && node.id === targetId && parent) {
-            if (direction == 'up') {
-              if (parent.type == 'Vertical') {
-                parent.children[0].flex = (parent.children[0].flex || 1) - 0.1;
-              } else if (parent.type == 'Horizon' && parent.parent?.type == 'Vertical') {
-                // immer 无法追踪到grandparent所以这里修改targetId后重新执行递归
-                targetId = parent.parent.children[0].id;
-                return findAndResize(draft.rootPane);
+        function resize(id: string): boolean {
+          const pane = draft.panes[id];
+          if (!pane) return false;
+
+          const parent = pane.parentId ? draft.panes[pane.parentId] : null;
+          if (pane.type === 'Leaf' && parent) {
+            if (direction === 'up') {
+              if (parent.type === 'Vertical') {
+                parent.childrenId.forEach((cid, idx) => {
+                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) - 0.1;
+                });
+              } else if (parent.type === 'Horizon' && parent.parentId) {
+                currentId = draft.panes[parent.parentId].childrenId[0];
+                return resize(currentId);
               }
-            } else if (direction == 'down') {
-              if (parent.type == 'Vertical') {
-                parent.children[0].flex = (parent.children[0].flex || 1) + 0.1;
-              } else if (parent.type == 'Horizon' && parent.parent?.type == 'Vertical') {
-                // parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
-                targetId = parent.parent.children[0].id;
-                return findAndResize(draft.rootPane);
+            } else if (direction === 'down') {
+              if (parent.type === 'Vertical') {
+                parent.childrenId.forEach((cid, idx) => {
+                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) + 0.1;
+                });
+              } else if (parent.type === 'Horizon' && parent.parentId) {
+                currentId = draft.panes[parent.parentId].childrenId[0];
+                return resize(currentId);
               }
-            } else if (direction == 'left') {
-              if (parent.type == 'Horizon') {
-                parent.children[0].flex = (parent.children[0].flex || 1) - 0.1;
-              } else if (parent.type == 'Vertical' && parent.parent?.type == 'Horizon') {
-                // parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) - 0.1;
-                targetId = parent.parent.children[0].id;
-                return findAndResize(draft.rootPane);
+            } else if (direction === 'left') {
+              if (parent.type === 'Horizon') {
+                parent.childrenId.forEach((cid, idx) => {
+                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) - 0.1;
+                });
+              } else if (parent.type === 'Vertical' && parent.parentId) {
+                currentId = draft.panes[parent.parentId].childrenId[0];
+                return resize(currentId);
               }
-            } else if (direction == 'right') {
-              if (parent.type == 'Horizon') {
-                parent.children[0].flex = (parent.children[0].flex || 1) + 0.1;
-              } else if (parent.type == 'Vertical' && parent.parent?.type == 'Horizon') {
-                // parent.parent.children[0].flex = (parent.parent.children[0].flex || 1) + 0.1;
-                targetId = parent.parent.children[0].id;
-                return findAndResize(draft.rootPane);
+            } else if (direction === 'right') {
+              if (parent.type === 'Horizon') {
+                parent.childrenId.forEach((cid, idx) => {
+                  if (idx === 0) draft.panes[cid].flex = (draft.panes[cid].flex || 1) + 0.1;
+                });
+              } else if (parent.type === 'Vertical' && parent.parentId) {
+                currentId = draft.panes[parent.parentId].childrenId[0];
+                return resize(currentId);
               }
             }
-
             return true;
           }
-
-          for (const child of node.children) {
-            if (findAndResize(child, node)) return true;
-          }
-          return false;
+          return pane.childrenId.some(cid => resize(cid));
         }
 
-        function findAndResizeGrandparent() {
-        }
-
-        findAndResize(draft.rootPane);
+        resize(currentId);
         break;
       }
     }
@@ -185,3 +188,4 @@ export function useTilingWM() {
   if (!context) throw new Error('useTilingWM must be used within TilingWMProvider');
   return context;
 }
+
