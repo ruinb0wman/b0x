@@ -1,6 +1,5 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 import { usePty } from './libs/pty'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
@@ -29,19 +28,9 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       devTools: true,
-      enableRemoteModule: false,
-      contextIsolation: true,
-      nodeIntegration: false
     },
   })
 
-
-  // Disable default Ctrl+W behavior (close window)
-  win.webContents.on('before-input-event', (event, input) => {
-    if (input.control && input.key.toLowerCase() === 'w') {
-      event.preventDefault()
-    }
-  })
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
@@ -77,6 +66,8 @@ app.on('activate', () => {
 })
 
 app.whenReady().then(() => {
+  Menu.setApplicationMenu(null);
+  // create window
   const win = createWindow()
   // Initialize terminal manager
   const pty = usePty();
