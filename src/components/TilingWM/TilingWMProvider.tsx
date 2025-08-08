@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { produce } from 'immer';
 import { v4 as uuidV4 } from 'uuid';
+import { Terminal } from '../../types/terminal'; // This line is crucial
 
 // === 类型定义 ===
 type TermInstance = Terminal.TermInstance;
