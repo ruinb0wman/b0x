@@ -3,35 +3,11 @@ import { produce } from 'immer';
 import { v4 as uuidV4 } from 'uuid';
 
 // === 类型定义 ===
-type TermInstance = {
-  id: string;
-  count: number;
-};
-
-type NodeType = 'Leaf' | 'Vertical' | 'Horizon';
-
-interface PaneNode {
-  id: string;
-  type: NodeType;
-  childrenId: string[];     // 子节点ID数组
-  termId: string | null;    // 指向 Term 的 ID
-  flex: number | null;
-  parentId: string | null;  // 父节点ID
-}
-
-interface TilingWMState {
-  panes: Record<string, PaneNode>; // 扁平化存储所有Pane
-  rootPaneId: string;              // 根Pane ID
-  terms: Record<string, TermInstance>;
-  activePaneId: string | null;
-}
-
-type TilingWMAction =
-  | { type: 'ATTACH_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
-  | { type: 'SET_ACTIVE_PANE'; paneId: string }
-  | { type: 'UPDATE_TERM_COUNT'; termId: string; count: number }
-  | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
-  | { type: 'CLOSE_PANE'; targetId: string };
+type TermInstance = Terminal.TermInstance;
+type NodeType = Terminal.NodeType;
+interface PaneNode extends Terminal.PaneNode {}
+interface TilingWMState extends Terminal.TilingWMState {}
+type TilingWMAction = Terminal.TilingWMAction;
 
 // === Context 定义 ===
 const TilingWMContext = createContext<{
@@ -217,4 +193,3 @@ export function useTilingWM() {
   if (!context) throw new Error('useTilingWM must be used within TilingWMProvider');
   return context;
 }
-
