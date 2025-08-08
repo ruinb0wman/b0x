@@ -1,4 +1,3 @@
-// TilingWMProvider.tsx
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { produce } from 'immer';
 import { v4 as uuidV4 } from 'uuid';
@@ -31,7 +30,8 @@ type TilingWMAction =
   | { type: 'ATTACH_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
   | { type: 'SET_ACTIVE_PANE'; paneId: string }
   | { type: 'UPDATE_TERM_COUNT'; termId: string; count: number }
-  | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' };
+  | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
+  | { type: 'CLOSE_PANE'; targetId: string };
 
 // === Context 定义 ===
 const TilingWMContext = createContext<{
@@ -112,47 +112,87 @@ function tilingWMReducer(state: TilingWMState, action: TilingWMAction) {
         break;
       }
 
-
       case 'RESIZE_PANE': {
         const { targetId, direction } = action;
-
-        // 查找需要修改 flex 的容器类型
         const targetLayout: NodeType =
           direction === 'left' || direction === 'right'
             ? 'Horizon'
             : 'Vertical';
 
-        // flex 调整值（左右/上下的 +/-）
         const delta =
           direction === 'left' || direction === 'up'
             ? -0.1
             : 0.1;
 
-        // 从 targetId 向上找合适的父节点
         let currentId: string | null = targetId;
         while (currentId) {
           const pane = draft.panes[currentId] as PaneNode | undefined;
           if (!pane) break;
           const parentId = pane.parentId;
-          if (!parentId) break; // 到根节点还没找到
+          if (!parentId) break;
 
           const parent = draft.panes[parentId];
           if (!parent) break;
 
           if (parent.type === targetLayout) {
-            // 修改第一个子 Pane 的 flex
             const firstChildId = parent.childrenId[0];
             if (firstChildId) {
               draft.panes[firstChildId].flex =
                 (draft.panes[firstChildId].flex || 1) + delta;
             }
-            break; // 找到就结束
+            break;
           }
-
-          // 否则继续往上找
           currentId = parentId;
         }
+        break;
+      }
 
+      case 'CLOSE_PANE': {
+        const { targetId } = action;
+        const targetPane = draft.panes[targetId];
+        if (!targetPane) return;
+
+        // If this is the root and only pane, do nothing
+        if (!targetPane.parentId) {
+          return;
+        }
+
+        // Remove associated term if any
+        if (targetPane.termId && draft.terms[targetPane.termId]) {
+          delete draft.terms[targetPane.termId];
+        }
+
+        const parent = draft.panes[targetPane.parentId];
+        if (!parent) return;
+
+        // Get sibling id
+        const siblingId = parent.childrenId.find(id => id !== targetId);
+        if (!siblingId) return;
+
+        // Promote sibling to take parent's place
+        const sibling = draft.panes[siblingId];
+        if (!sibling) return;
+
+        // If parent is root
+        if (!parent.parentId) {
+          sibling.parentId = null;
+          draft.rootPaneId = sibling.id;
+        } else {
+          const gp = draft.panes[parent.parentId];
+          const index = gp.childrenId.indexOf(parent.id);
+          if (index !== -1) {
+            gp.childrenId[index] = sibling.id;
+          }
+          sibling.parentId = gp.id;
+        }
+
+        // Copy sibling data into parent if we want to keep parent's id
+        // But here simpler: promote sibling to parent's position by replacing parent in the tree structures
+        // Remove old panes
+        delete draft.panes[targetId];
+        delete draft.panes[parent.id];
+
+        draft.activePaneId = sibling.type === 'Leaf' ? sibling.id : null;
         break;
       }
 
