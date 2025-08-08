@@ -33,10 +33,12 @@ function createWindow() {
   })
 
 
-  // Prevent default Ctrl+W behaviour (window close)
+  // Handle Ctrl+W to close pane instead of window
   win.webContents.on('before-input-event', (event, input) => {
     if (input.control && input.key.toLowerCase() === 'w') {
       event.preventDefault()
+      // Send message to renderer to close pane
+      win?.webContents.send('close-pane')
     }
   })
 

@@ -32,15 +32,24 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
         if (dir) {
           dispatch({ type: 'RESIZE_PANE', targetId: state.activePaneId, direction: dir });
         }
-      } else if (e.ctrlKey && e.key === 'w') {
-        console.log('try close')
-        e.preventDefault();
+      }
+    };
+
+    // Handle IPC message from main process for Ctrl+W
+    const handleClosePane = () => {
+      console.log('try close')
+      if (state.activePaneId) {
         dispatch({ type: 'CLOSE_PANE', targetId: state.activePaneId });
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.ipcRenderer.on('close-pane', handleClosePane);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.ipcRenderer.off('close-pane', handleClosePane);
+    };
   }, [state.activePaneId, dispatch]);
 
   // 递归渲染 Pane
