@@ -33,6 +33,13 @@ function createWindow() {
   })
 
 
+  // Prevent default Ctrl+W behaviour (window close)
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.control && input.key.toLowerCase() === 'w') {
+      event.preventDefault()
+    }
+  })
+
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
