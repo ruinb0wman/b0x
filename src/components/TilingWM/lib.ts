@@ -89,12 +89,8 @@ export function closePane(draft: WritableDraft<Terminal.TilingWMState>, action: 
   if (action.type != 'CLOSE_PANE') return;
   const { targetId } = action;
   const targetPane = draft.panes[targetId];
-  if (!targetPane) return;
-
-  // If this is the root and only pane, do nothing
-  if (!targetPane.parentId) {
-    return;
-  }
+  // 找不到pane或者pane是根节点则退出
+  if (!targetPane || !targetPane.parentId) return;
 
   // Remove associated term if any
   if (targetPane.termId && draft.terms[targetPane.termId]) {

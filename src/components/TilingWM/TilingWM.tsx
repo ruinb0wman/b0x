@@ -40,7 +40,7 @@ export default function TilingWM({ renderPaneContent }: { renderPaneContent: (te
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };

@@ -17,7 +17,6 @@ export default function TermCom({ termId }: Props) {
   const terminalInstance = useRef<Terminal | null>(null)
   const fitAddon = useRef<FitAddon | null>(null)
   const resizeObserver = useRef<ResizeObserver | null>(null)
-  console.log('TerminalSessionCache', TerminalSessionCache);
 
   useEffect(() => {
     if (!terminalRef.current) return
@@ -161,9 +160,6 @@ export default function TermCom({ termId }: Props) {
       if (resizeObserver.current) {
         resizeObserver.current.disconnect()
       }
-      // 🔴 注意：不要在这里 destroy backend，除非你确定要关闭终端
-      // 如果是布局重排，应该保留 backend session
-      // 后端销毁应由显式“关闭 tab”操作触发，比如发送 'terminal:destroy'
     }
   }, [termId]) // 依赖 termId：切换 pane 时重建
 
