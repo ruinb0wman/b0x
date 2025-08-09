@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { produce, enableMapSet } from 'immer';
+import { produce } from 'immer';
 import { createTerm, createPane, attachPane, resizePane, closePane } from './lib';
 
 type Store = {
@@ -8,7 +8,6 @@ type Store = {
   dispatch: (action: Terminal.TilingWMAction) => void;
 };
 
-enableMapSet();
 // 初始化 state
 const initialTerm = createTerm();
 const rootPane = createPane(initialTerm.id, null);
@@ -19,11 +18,6 @@ const initialState: Terminal.TilingWMState = {
   // termId -> node-pty process id(pid)
   session: {}
 };
-
-// 在页面关闭时清除session, 确保下次打开时能创建新的pty进程
-window.addEventListener('beforeunload', () => {
-  useTerminalStore.setState({ state: { ...useTerminalStore.getState().state, session: {} } });
-});
 
 export const useTerminalStore = create<Store>()(
   persist(
@@ -64,3 +58,7 @@ export const useTerminalStore = create<Store>()(
   )
 );
 
+// 在页面关闭时清除session, 确保下次打开时能创建新的pty进程
+window.ipcRenderer.on('window-close', () => {
+  useTerminalStore.setState({ state: { ...useTerminalStore.getState().state, session: {} } });
+})

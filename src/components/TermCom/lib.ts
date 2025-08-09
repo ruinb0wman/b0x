@@ -1,7 +1,7 @@
 import type { Terminal } from "@xterm/xterm"
-import type { FitAddon } from "@xterm/addon-fit";
+import type { FitAddon } from "@xterm/addon-fit"
 
-export function bindTerminalEvents(terminal: Terminal, fitAddon: FitAddon, terminalRef: HTMLDivElement, resizeObserver: ResizeObserver, pid: number) {
+export function bindTerminalIO(terminal: Terminal, pid: number) {
   // 监听后端输出
   const onData = (_: any, dataObj: any) => {
     if (dataObj.id === pid && terminal) {
@@ -18,15 +18,23 @@ export function bindTerminalEvents(terminal: Terminal, fitAddon: FitAddon, termi
   }
   terminal.onData(onTerminalData)
 
-  // 监听 resize
+
+
+  // 返回清理函数
+  return () => {
+    window.ipcRenderer.off('terminal:data', onData)
+  }
+}
+
+export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, terminal: Terminal, pid: number) {
   let resizeRequest: number
-  const ro = new ResizeObserver(() => {
+  const resizeObserver = new ResizeObserver(() => {
     cancelAnimationFrame(resizeRequest)
     resizeRequest = requestAnimationFrame(() => {
-      if (fitAddon && terminalRef && terminal) {
+      if (fitAddon && container && terminal) {
         try {
           fitAddon.fit()
-          const { cols, rows } = terminal;
+          const { cols, rows } = terminal
           window.ipcRenderer.invoke('terminal:resize', { id: pid, cols, rows })
         } catch (e) {
           console.error('Resize error:', e)
@@ -34,27 +42,9 @@ export function bindTerminalEvents(terminal: Terminal, fitAddon: FitAddon, termi
       }
     })
   })
-  ro.observe(terminalRef)
-  resizeObserver = ro
+  resizeObserver.observe(container)
 
-  // 清理函数
   return () => {
-    window.ipcRenderer.off('terminal:data', onData)
-    ro.disconnect()
+    resizeObserver.disconnect();
   }
-}
-
-export function preventShortcutsCapture(terminal: Terminal) {
-  terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-    if (
-      (event.ctrlKey || event.altKey) &&
-      event.shiftKey &&
-      ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
-    ) {
-      return false
-    } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
-      return false;
-    }
-    return true
-  })
 }

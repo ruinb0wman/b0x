@@ -5,6 +5,7 @@ import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
 import { useTerminalStore } from '@/store/terminalStore/terminalStore'
+import { bindTerminalIO, observeResize } from "./lib"
 
 interface Props {
   termId: string
@@ -12,15 +13,12 @@ interface Props {
 
 export default function TermCom({ termId }: Props) {
   const terminalRef = useRef<HTMLDivElement>(null)
-  // const terminalInstance = useRef<Terminal | null>(null)
-  const fitAddon = useRef<FitAddon | null>(null)
-  const resizeObserver = useRef<ResizeObserver | null>(null)
   const { state, dispatch } = useTerminalStore();
 
   useEffect(() => {
     if (!terminalRef.current) return
-
     const container = terminalRef.current
+    const cleaner: (() => void)[] = [];
 
     // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
@@ -36,12 +34,10 @@ export default function TermCom({ termId }: Props) {
       }
       return true
     })
-    // terminalInstance.current = terminal
 
     // 添加插件
-    const fitAddonInstance = new FitAddon()
-    terminal.loadAddon(fitAddonInstance)
-    fitAddon.current = fitAddonInstance
+    const fitAddon = new FitAddon()
+    terminal.loadAddon(fitAddon)
 
     try {
       terminal.loadAddon(new WebglAddon())
@@ -54,22 +50,20 @@ export default function TermCom({ termId }: Props) {
 
     // 强制布局
     const timeout = setTimeout(() => {
-      if (!container || !fitAddon.current) return
-      container.clientWidth
-      container.clientHeight
-      fitAddon.current.fit()
+      if (!container || !fitAddon) return
+      fitAddon.fit()
 
       const initialCols = Math.max(terminal.cols, 10)
       const initialRows = Math.max(terminal.rows, 5)
 
       let backendId: number
-      let isReconnected = false
+      // let isReconnected = false
 
       // 🔍 检查是否已有该 termId 的 backend session
       console.log('session', state.session)
       if (state.session && termId in state.session) {
         backendId = state.session[termId]
-        isReconnected = true
+        // isReconnected = true
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
       } else {
         // 🆕 创建新终端
@@ -88,20 +82,12 @@ export default function TermCom({ termId }: Props) {
         return
       }
 
-      // 如果是重连，立即绑定事件
-      bindTerminalEvents(terminal, backendId)
-
-      // 强制重新 fit（可选）
-      if (isReconnected) {
-        setTimeout(() => {
-          fitAddon.current?.fit()
-          const { cols, rows } = terminal
-          window.ipcRenderer.invoke('terminal:resize', { id: backendId, cols, rows }).catch(console.error)
-        }, 50)
-      }
+      // 绑定事件处理
+      cleaner.push(bindTerminalIO(terminal, backendId));
+      // 监听窗口大小变化
+      cleaner.push(observeResize(fitAddon, container, terminal, backendId));
     }, 100)
 
-    // 绑定事件的函数（可复用）
     function bindTerminalEvents(terminal: Terminal, pid: number) {
       // 监听后端输出
       const onData = (_: any, dataObj: any) => {
@@ -124,9 +110,9 @@ export default function TermCom({ termId }: Props) {
       const ro = new ResizeObserver(() => {
         cancelAnimationFrame(resizeRequest)
         resizeRequest = requestAnimationFrame(() => {
-          if (fitAddon.current && container && terminal) {
+          if (fitAddon && container && terminal) {
             try {
-              fitAddon.current.fit()
+              fitAddon.fit()
               const { cols, rows } = terminal
               window.ipcRenderer.invoke('terminal:resize', { id: pid, cols, rows })
             } catch (e) {
@@ -136,32 +122,19 @@ export default function TermCom({ termId }: Props) {
         })
       })
       ro.observe(container)
-      resizeObserver.current = ro
 
-      // 清理函数
-      const cleanup = () => {
-        // window.ipcRenderer.removeAllListeners('terminal:data')
-        // terminal?.offData(onTerminalData)
+      // 返回清理函数
+      return () => {
         window.ipcRenderer.off('terminal:data', onData)
         ro.disconnect()
-        // 注意：不 destroy backend，除非显式关闭 pane
       }
-
-        // 存储 cleanup 函数以便销毁时调用
-        ; (terminal as any)._cleanup = cleanup
     }
 
     // 💥 组件卸载时清理
     return () => {
       clearTimeout(timeout);
-      if (terminal) {
-        // 调用 cleanup
-        ; (terminal as any)._cleanup?.()
-        terminal.dispose()
-      }
-      if (resizeObserver.current) {
-        resizeObserver.current.disconnect()
-      }
+      terminal.dispose()
+      cleaner.forEach(fn => fn());
     }
   }, [termId]) // 依赖 termId：切换 pane 时重建
 
