@@ -1,6 +1,6 @@
 import DragWrapper from "@/components/DragWrapper";
 import TilingWM from '@/components/TilingWM';
-import TermCom from "@/components/TermCom";
+import TermCom from "@/components/TermCom/TermCom";
 
 export default function App() {
   const renderPaneContent = (termId: string) => <TermCom termId={termId} />;
@@ -8,7 +8,7 @@ export default function App() {
   return (
     <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', }}>
       <DragWrapper>
-        <div style={{ width: '100vw', height: '5px' }}></div>
+        <div >hello</div>
       </DragWrapper>
       <TilingWM renderPaneContent={renderPaneContent} />
     </div>

@@ -20,6 +20,11 @@ const initialState: Terminal.TilingWMState = {
   session: {}
 };
 
+// 在页面关闭时清除session, 确保下次打开时能创建新的pty进程
+window.addEventListener('beforeunload', () => {
+  useTerminalStore.setState({ state: { ...useTerminalStore.getState().state, session: {} } });
+});
+
 export const useTerminalStore = create<Store>()(
   persist(
     (set) => ({
