@@ -70,7 +70,7 @@ export default function TermCom({ termId }: Props) {
 
       // 🔍 检查是否已有该 termId 的 backend session
       console.log('session', state.session)
-      if (state.session.has(termId)) {
+      if (state.session && state.session.has(termId)) {
         backendId = state.session.get(termId)!
         isReconnected = true
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)

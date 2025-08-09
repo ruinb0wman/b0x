@@ -53,6 +53,33 @@ export const useTerminalStore = create<Store>()(
     }),
     {
       name: 'tiling-wm-store',
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          if (!str) return null;
+          const parsed = JSON.parse(str);
+          // Restore Map from serialized array
+          if (parsed.state?.state?.session) {
+            parsed.state.state.session = new Map(parsed.state.state.session);
+          }
+          return parsed;
+        },
+        setItem: (name, value) => {
+          // Convert Map to array for serialization
+          const toSerialize = {
+            ...value,
+            state: {
+              ...value.state,
+              state: {
+                ...value.state.state,
+                session: Array.from(value.state.state.session.entries())
+              }
+            }
+          };
+          localStorage.setItem(name, JSON.stringify(toSerialize));
+        },
+        removeItem: (name) => localStorage.removeItem(name),
+      },
     }
   )
 );
