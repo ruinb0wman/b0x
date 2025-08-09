@@ -6,9 +6,6 @@ import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
 import { useTerminalStore } from '@/store/terminalStore/terminalStore'
 
-// 👇 全局缓存：termId -> 后端 pty process id(pid)
-// const TerminalSessionCache = new Map<string, number>()
-
 interface Props {
   termId: string
 }
@@ -70,8 +67,8 @@ export default function TermCom({ termId }: Props) {
 
       // 🔍 检查是否已有该 termId 的 backend session
       console.log('session', state.session)
-      if (state.session && state.session.has(termId)) {
-        backendId = state.session.get(termId)!
+      if (state.session && termId in state.session) {
+        backendId = state.session[termId]
         isReconnected = true
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
       } else {

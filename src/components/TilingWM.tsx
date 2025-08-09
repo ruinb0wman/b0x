@@ -1,4 +1,4 @@
-import { useTilingWMStore } from '@/store/terminalStore/terminalStore'; // ← 这里改成你的 Zustand store 路径
+import { useTerminalStore } from '@/store/terminalStore/terminalStore'; // ← 这里改成你的 Zustand store 路径
 import { useEffect } from 'react';
 
 interface Props {
@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function TilingWM({ renderPaneContent }: Props) {
-  const { state, dispatch } = useTilingWMStore();
+  const { state, dispatch } = useTerminalStore();
 
   // 激活当前 Pane
   const handlePaneClick = (paneId: string) => {
