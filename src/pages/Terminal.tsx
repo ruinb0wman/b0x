@@ -1,6 +1,5 @@
-import DragWrapper from "../components/DragWrapper";
-import { TilingWMProvider } from '../components/TilingWM/TilingWMProvider';
-import TilingWM from '../components/TilingWM/TilingWM';
+import DragWrapper from "@/components/DragWrapper";
+import TilingWM from '@/components/TilingWM';
 import TermCom from "@/components/TermCom";
 
 export default function App() {
@@ -11,9 +10,7 @@ export default function App() {
       <DragWrapper>
         <div style={{ width: '100vw', height: '5px' }}></div>
       </DragWrapper>
-      <TilingWMProvider>
-        <TilingWM renderPaneContent={renderPaneContent} />
-      </TilingWMProvider>
+      <TilingWM renderPaneContent={renderPaneContent} />
     </div>
   );
 }
