@@ -3,10 +3,11 @@ import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
-import config from '../config'
+import config from '@/config'
+import { useTerminalStore } from '@/store/terminalStore/terminalStore'
 
-// 👇 全局缓存：termId -> 后端 terminal id
-const TerminalSessionCache = new Map<string, number>()
+// 👇 全局缓存：termId -> 后端 pty process id(pid)
+// const TerminalSessionCache = new Map<string, number>()
 
 interface Props {
   termId: string
@@ -17,6 +18,7 @@ export default function TermCom({ termId }: Props) {
   const terminalInstance = useRef<Terminal | null>(null)
   const fitAddon = useRef<FitAddon | null>(null)
   const resizeObserver = useRef<ResizeObserver | null>(null)
+  const { state, dispatch } = useTerminalStore();
 
   useEffect(() => {
     if (!terminalRef.current) return
@@ -67,8 +69,9 @@ export default function TermCom({ termId }: Props) {
       let isReconnected = false
 
       // 🔍 检查是否已有该 termId 的 backend session
-      if (TerminalSessionCache.has(termId)) {
-        backendId = TerminalSessionCache.get(termId)!
+      console.log('session', state.session)
+      if (state.session.has(termId)) {
+        backendId = state.session.get(termId)!
         isReconnected = true
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
       } else {
@@ -77,7 +80,7 @@ export default function TermCom({ termId }: Props) {
           .invoke('terminal:create', { cols: initialCols, rows: initialRows })
           .then((id: number) => {
             console.log(`New terminal created for termId: ${termId}, backendId: ${id}`)
-            TerminalSessionCache.set(termId, id)
+            dispatch({ type: 'SET_SESSION', termId, pid: id })
             backendId = id
             // 继续后续绑定
             bindTerminalEvents(terminal, id)
@@ -102,10 +105,10 @@ export default function TermCom({ termId }: Props) {
     }, 100)
 
     // 绑定事件的函数（可复用）
-    function bindTerminalEvents(terminal: Terminal, id: number) {
+    function bindTerminalEvents(terminal: Terminal, pid: number) {
       // 监听后端输出
       const onData = (_: any, dataObj: any) => {
-        if (dataObj.id === id && terminalInstance.current) {
+        if (dataObj.id === pid && terminalInstance.current) {
           terminalInstance.current.write(dataObj.data)
         }
       }
@@ -113,7 +116,7 @@ export default function TermCom({ termId }: Props) {
 
       // 监听用户输入
       const onTerminalData = (data: string) => {
-        window.ipcRenderer.invoke('terminal:write', { id, data }).catch((err) => {
+        window.ipcRenderer.invoke('terminal:write', { id: pid, data }).catch((err) => {
           console.error('Failed to write to terminal:', err)
         })
       }
@@ -128,7 +131,7 @@ export default function TermCom({ termId }: Props) {
             try {
               fitAddon.current.fit()
               const { cols, rows } = terminal
-              window.ipcRenderer.invoke('terminal:resize', { id, cols, rows })
+              window.ipcRenderer.invoke('terminal:resize', { id: pid, cols, rows })
             } catch (e) {
               console.error('Resize error:', e)
             }

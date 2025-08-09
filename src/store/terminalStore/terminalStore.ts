@@ -15,9 +15,11 @@ const initialState: Terminal.TilingWMState = {
   panes: { [rootPane.id]: rootPane },
   rootPaneId: rootPane.id,
   activePaneId: null,
+  // termId -> node-pty process id(pid)
+  session: new Map<string, number>()
 };
 
-export const useTilingWMStore = create<Store>()(
+export const useTerminalStore = create<Store>()(
   persist(
     (set) => ({
       state: initialState,
@@ -40,6 +42,9 @@ export const useTilingWMStore = create<Store>()(
 
               case 'CLOSE_PANE':
                 closePane(draft.state, action);
+                break;
+              case 'SET_SESSION':
+                draft.state.session.set(action.termId, action.pid);
                 break;
             }
           })
