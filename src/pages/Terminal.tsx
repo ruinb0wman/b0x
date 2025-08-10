@@ -6,7 +6,7 @@ export default function App() {
   const renderPaneContent = (termId: string) => <TermCom termId={termId} />;
 
   return (
-    <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', }}>
+    <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <DragWrapper>
         <div >hello</div>
       </DragWrapper>

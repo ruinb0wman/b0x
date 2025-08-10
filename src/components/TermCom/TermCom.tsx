@@ -6,6 +6,7 @@ import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
 import { useTerminalStore } from '@/store/terminalStore/terminalStore'
 import { bindTerminalIO, observeResize } from "./lib"
+import "./style.css"
 
 interface Props {
   termId: string
@@ -14,26 +15,6 @@ interface Props {
 export default function TermCom({ termId }: Props) {
   const terminalRef = useRef<HTMLDivElement>(null)
   const { state, dispatch } = useTerminalStore();
-
-  useEffect(() => {
-    // Inject styles to hide xterm scrollbar
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .xterm-viewport {
-        scrollbar-width: none !important; /* Firefox */
-      }
-      .xterm-viewport::-webkit-scrollbar {
-        display: none !important; /* Chrome, Safari */
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      if (style.parentNode) {
-        style.parentNode.removeChild(style);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!terminalRef.current) return
