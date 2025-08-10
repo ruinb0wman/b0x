@@ -5,7 +5,7 @@ import { createTerm, createPane, attachPane, resizePane, closePane } from './lib
 
 type Store = {
   state: Terminal.WindowTabState;
-  dispatch: (action: Terminal.TilingWMAction) => void;
+  dispatch: (action: Terminal.TilingWMAction | { type: 'SET_ACTIVE_WINDOW', windowIndex: number } | { type: 'NEW_WINDOW' }) => void;
 };
 
 // 初始化 state
@@ -34,6 +34,16 @@ export const useTerminalStore = create<Store>()(
       dispatch: (action) => {
         set(
           produce<Store>((draft) => {
+            if (action.type === 'SET_ACTIVE_WINDOW') {
+              draft.state.activeWindowIndex = action.windowIndex;
+              return;
+            }
+            if (action.type === 'NEW_WINDOW') {
+              draft.state.windows.push(genTilingState());
+              draft.state.activeWindowIndex = draft.state.windows.length - 1;
+              return;
+            }
+
             const activeIndex = draft.state.activeWindowIndex;
             switch (action.type) {
               case 'SET_ACTIVE_PANE':
