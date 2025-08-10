@@ -67,7 +67,7 @@ export const useTerminalStore = create<Store>()(
 
 // 在页面关闭时清除session, 确保下次打开时能创建新的pty进程
 window.ipcRenderer.on('window-close', () => {
-  const state = useTerminalStore.getState().state;
+  const state = { ...useTerminalStore.getState().state };
   state.windows.map((w) => {
     return {
       ...w,
