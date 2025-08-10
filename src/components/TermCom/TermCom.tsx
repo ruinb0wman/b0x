@@ -161,6 +161,8 @@ export default function TermCom({ termId }: Props) {
         minHeight: '300px',
         overflow: 'hidden',
         position: 'relative',
+        padding: '5px',
+        boxSizing: 'border-box'
       }}
     />
   )
