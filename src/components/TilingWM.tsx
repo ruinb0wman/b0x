@@ -14,7 +14,8 @@ export default function TilingWM({ renderPaneContent }: Props) {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (!state.activePaneId) return;
+    const activeWindow = state.windows[state.activeWindowIndex];
+    if (!activeWindow.activePaneId) return;
 
     const directionMap: Record<string, 'left' | 'right' | 'up' | 'down'> = {
       ArrowLeft: 'left',
@@ -29,7 +30,7 @@ export default function TilingWM({ renderPaneContent }: Props) {
       if (dir) {
         dispatch({
           type: 'ATTACH_PANE',
-          targetId: state.activePaneId,
+          targetId: activeWindow.activePaneId,
           direction: dir,
         });
       }
@@ -39,7 +40,7 @@ export default function TilingWM({ renderPaneContent }: Props) {
       if (dir) {
         dispatch({
           type: 'RESIZE_PANE',
-          targetId: state.activePaneId,
+          targetId: activeWindow.activePaneId,
           direction: dir,
         });
       }
@@ -47,7 +48,7 @@ export default function TilingWM({ renderPaneContent }: Props) {
       e.preventDefault();
       dispatch({
         type: 'CLOSE_PANE',
-        targetId: state.activePaneId,
+        targetId: activeWindow.activePaneId,
       });
     }
   };
@@ -56,15 +57,16 @@ export default function TilingWM({ renderPaneContent }: Props) {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.activePaneId, dispatch]);
+  }, [state.activeWindowIndex, dispatch]);
 
   // 递归渲染 Pane
   const renderPane = (paneId: string): React.ReactNode => {
-    const pane = state.panes[paneId];
+    const activeWindow = state.windows[state.activeWindowIndex];
+    const pane = activeWindow.panes[paneId];
     if (!pane) return null;
 
     if (pane.type === 'Leaf') {
-      const isActive = state.activePaneId === pane.id;
+      const isActive = activeWindow.activePaneId === pane.id;
       return (
         <div
           key={pane.id}
@@ -122,7 +124,7 @@ export default function TilingWM({ renderPaneContent }: Props) {
 
   return (
     <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {renderPane(state.rootPaneId)}
+      {renderPane(state.windows[state.activeWindowIndex].rootPaneId)}
     </div>
   );
 }

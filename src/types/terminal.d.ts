@@ -36,4 +36,9 @@ declare namespace Terminal {
     | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
     | { type: 'CLOSE_PANE'; targetId: string }
     | { type: 'SET_SESSION'; termId: string, pid: number };
+
+  interface WindowTabState {
+    windows: TilingWMState[];
+    activeWindowIndex: number;
+  }
 }

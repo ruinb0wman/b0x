@@ -53,6 +53,7 @@ export default function TermCom({ termId }: Props) {
     const timeout = setTimeout(() => {
       if (!container || !fitAddon) return
       fitAddon.fit()
+      const activeWindow = state.windows[state.activeWindowIndex];
 
       const initialCols = Math.max(terminal.cols, 10)
       const initialRows = Math.max(terminal.rows, 5)
@@ -60,9 +61,9 @@ export default function TermCom({ termId }: Props) {
       let backendId: number
 
       // 🔍 检查是否已有该 termId 的 backend session
-      console.log('session', state.session)
-      if (state.session && termId in state.session) {
-        backendId = state.session[termId]
+      console.log('session', activeWindow.session)
+      if (activeWindow.session && termId in activeWindow.session) {
+        backendId = activeWindow.session[termId]
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
       } else {
         // 🆕 创建新终端
