@@ -48,3 +48,20 @@ export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, ter
     resizeObserver.disconnect();
   }
 }
+
+export function preventShortcutCapture(terminal: Terminal) {
+  terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
+    if (
+      (event.ctrlKey || event.altKey) &&
+      event.shiftKey &&
+      ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
+    ) {
+      return false
+    } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
+      return false;
+    } else if (event.ctrlKey && event.key.toLowerCase() == 't') {
+      return false;
+    }
+    return true
+  })
+}

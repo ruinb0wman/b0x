@@ -5,7 +5,7 @@ import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
 import { useTerminalStore } from '@/store/terminalStore/terminalStore'
-import { bindTerminalIO, observeResize } from "./lib"
+import { bindTerminalIO, observeResize, preventShortcutCapture } from "./lib"
 import "./style.css"
 
 interface Props {
@@ -23,18 +23,8 @@ export default function TermCom({ termId }: Props) {
 
     // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
-    terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-      if (
-        (event.ctrlKey || event.altKey) &&
-        event.shiftKey &&
-        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
-      ) {
-        return false
-      } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
-        return false;
-      }
-      return true
-    })
+    preventShortcutCapture(terminal);
+
 
     // 添加插件
     const fitAddon = new FitAddon()
