@@ -16,6 +16,26 @@ export default function TermCom({ termId }: Props) {
   const { state, dispatch } = useTerminalStore();
 
   useEffect(() => {
+    // Inject styles to hide xterm scrollbar
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .xterm-viewport {
+        scrollbar-width: none !important; /* Firefox */
+      }
+      .xterm-viewport::-webkit-scrollbar {
+        display: none !important; /* Chrome, Safari */
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      if (style.parentNode) {
+        style.parentNode.removeChild(style);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!terminalRef.current) return
     const container = terminalRef.current
     const cleaner: (() => void)[] = [];
@@ -57,13 +77,11 @@ export default function TermCom({ termId }: Props) {
       const initialRows = Math.max(terminal.rows, 5)
 
       let backendId: number
-      // let isReconnected = false
 
       // 🔍 检查是否已有该 termId 的 backend session
       console.log('session', state.session)
       if (state.session && termId in state.session) {
         backendId = state.session[termId]
-        // isReconnected = true
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
       } else {
         // 🆕 创建新终端
@@ -73,7 +91,6 @@ export default function TermCom({ termId }: Props) {
             console.log(`New terminal created for termId: ${termId}, backendId: ${id}`)
             dispatch({ type: 'SET_SESSION', termId, pid: id })
             backendId = id
-            // 继续后续绑定
             bindTerminalEvents(terminal, id)
           })
           .catch((err: any) => {
@@ -84,7 +101,6 @@ export default function TermCom({ termId }: Props) {
 
       // 绑定事件处理
       cleaner.push(bindTerminalIO(terminal, backendId));
-      // 监听窗口大小变化
       cleaner.push(observeResize(fitAddon, container, terminal, backendId));
     }, 100)
 
@@ -123,20 +139,18 @@ export default function TermCom({ termId }: Props) {
       })
       ro.observe(container)
 
-      // 返回清理函数
       return () => {
         window.ipcRenderer.off('terminal:data', onData)
         ro.disconnect()
       }
     }
 
-    // 💥 组件卸载时清理
     return () => {
       clearTimeout(timeout);
       terminal.dispose()
       cleaner.forEach(fn => fn());
     }
-  }, [termId]) // 依赖 termId：切换 pane 时重建
+  }, [termId])
 
   return (
     <div
