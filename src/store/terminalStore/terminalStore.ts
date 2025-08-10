@@ -9,12 +9,9 @@ type Store = {
 };
 
 // 初始化 state
-const initialTerm = createTerm();
-const rootPane = createPane(initialTerm.id, null);
-
-const initialState: Terminal.WindowTabState = { activeWindowIndex: 0, windows: [genTilingState()] }
-
 function genTilingState() {
+  const initialTerm = createTerm();
+  const rootPane = createPane(initialTerm.id, null);
   return {
     panes: { [rootPane.id]: rootPane },
     rootPaneId: rootPane.id,
@@ -23,6 +20,11 @@ function genTilingState() {
     session: {}
   };
 }
+
+const initialState: Terminal.WindowTabState = {
+  activeWindowIndex: 0,
+  windows: [genTilingState()]
+};
 
 export const useTerminalStore = create<Store>()(
   persist(
@@ -36,7 +38,6 @@ export const useTerminalStore = create<Store>()(
             switch (action.type) {
               case 'SET_ACTIVE_PANE':
                 draft.state.windows[activeIndex].activePaneId = action.paneId;
-                // draft.state.activePaneId = action.paneId;
                 break;
 
               case 'ATTACH_PANE':
@@ -67,12 +68,10 @@ export const useTerminalStore = create<Store>()(
 
 // 在页面关闭时清除session, 确保下次打开时能创建新的pty进程
 window.ipcRenderer.on('window-close', () => {
-  const state = { ...useTerminalStore.getState().state };
-  state.windows.map((w) => {
-    return {
-      ...w,
-      session: {}
-    }
-  })
-  useTerminalStore.setState({ state });
-})
+  const currentState = { ...useTerminalStore.getState().state };
+  currentState.windows = currentState.windows.map((w) => ({
+    ...w,
+    session: {}
+  }));
+  useTerminalStore.setState({ state: currentState });
+});
