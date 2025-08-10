@@ -6,7 +6,8 @@
     "package.json",
     "tsconfig.json",
     "tsconfig.node.json",
-    "vite.config.ts"
+    "vite.config.ts",
+    "electron-builder.json5"
   ],
   "exclude": [
     "node_modules",
