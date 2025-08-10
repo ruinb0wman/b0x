@@ -57,7 +57,7 @@ export default function TilingWM({ renderPaneContent }: Props) {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.activeWindowIndex, dispatch]);
+  }, [state.windows, state.activeWindowIndex, dispatch]);
 
   // 递归渲染 Pane
   const renderPane = (paneId: string): React.ReactNode => {
