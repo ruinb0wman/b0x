@@ -48,7 +48,7 @@ export default function WindowTab() {
   }, [state.windows.length, dispatch]);
 
   return (
-    <div style={{ display: 'flex', gap: '10px', margin: '10px 5px' }}>
+    <div style={{ display: 'flex', gap: '10px' }}>
       {state.windows.map((_, i) => {
         return (
           <TabButton
