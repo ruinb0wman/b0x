@@ -43,7 +43,7 @@ export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, ter
   resizeObserver.observe(container)
 
   return () => {
-    resizeObserver.disconnect();
+    resizeObserver.disconnect()
   }
 }
 
@@ -54,14 +54,23 @@ export function preventShortcutCapture(terminal: Terminal) {
       event.shiftKey &&
       ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
     ) {
-      return false
+      return false // Prevent these specific shortcuts
     } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 't') {
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 'tab') {
       return false;
+    } else if (event.ctrlKey) {
+      if (event.key.toLowerCase() === 'c') {
+        if (terminal.hasSelection()) {
+          return false; // Prevent xterm.js from sending Ctrl+C to the shell
+        }
+        return true;
+      } else if (event.key.toLowerCase() === 'v') {
+        return true;
+      }
     }
-    return true
+    return true // Allow other keys to pass through by default
   })
 }
