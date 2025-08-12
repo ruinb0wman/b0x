@@ -25,6 +25,9 @@ export default function TermCom({ termId }: Props) {
 
     // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
+    // We will handle Ctrl+C/V directly in this component's useEffect
+    // so we don't need preventShortcutCapture to specifically allow them.
+    // It will still prevent other shortcuts.
     preventShortcutCapture(terminal);
 
     // 添加插件
@@ -38,10 +41,30 @@ export default function TermCom({ termId }: Props) {
       console.warn('WebGL addon could not be loaded, falling back to canvas renderer')
     }
 
-    // 打开 terminal
+    // Open terminal
     terminal.open(container)
 
-    // 强制布局
+    // Custom key event handler for copy/paste
+    terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
+      if (event.ctrlKey) {
+        if (event.key.toLowerCase() === 'c') {
+          if (terminal.hasSelection()) {
+            // If text is selected, copy it
+            document.execCommand('copy'); // Use native copy command
+            return false; // Prevent xterm.js from sending Ctrl+C to the shell
+          }
+          // If no text is selected, allow Ctrl+C to pass through to send interrupt
+          return true;
+        } else if (event.key.toLowerCase() === 'v') {
+          // Allow Ctrl+V to pass through for paste (ClipboardAddon handles this)
+          return true;
+        }
+      }
+      return true; // Allow other keys to pass through
+    });
+
+
+    // Force layout
     const timeout = setTimeout(() => {
       if (!container || !fitAddon) return
       fitAddon.fit()
@@ -51,13 +74,13 @@ export default function TermCom({ termId }: Props) {
       const initialRows = Math.max(terminal.rows, 5)
 
 
-      // 🔍 检查是否已有该 termId 的 backend session
+      // 🔍 Check if there's an existing backend session for this termId
       console.log('session', activeWindow.session)
       if (activeWindow.session && termId in activeWindow.session) {
         pid = activeWindow.session[termId]
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${pid}`)
       } else {
-        // 🆕 创建新终端
+        // 🆕 Create new terminal
         window.ipcRenderer
           .invoke('terminal:create', { cols: initialCols, rows: initialRows })
           .then((id: number) => {
@@ -72,13 +95,13 @@ export default function TermCom({ termId }: Props) {
         return
       }
 
-      // 绑定事件处理
+      // Bind event handlers
       cleaner.push(bindTerminalIO(terminal, pid));
       cleaner.push(observeResize(fitAddon, container, terminal, pid));
     }, 100)
 
     function bindTerminalEvents(terminal: Terminal, pid: number) {
-      // 监听后端输出
+      // Listen for backend output
       const onData = (_: any, dataObj: any) => {
         if (dataObj.id === pid && terminal) {
           terminal.write(dataObj.data)
@@ -86,7 +109,7 @@ export default function TermCom({ termId }: Props) {
       }
       window.ipcRenderer.on('terminal:data', onData)
 
-      // 监听用户输入
+      // Listen for user input
       const onTerminalData = (data: string) => {
         window.ipcRenderer.invoke('terminal:write', { id: pid, data }).catch((err) => {
           console.error('Failed to write to terminal:', err)
@@ -94,7 +117,7 @@ export default function TermCom({ termId }: Props) {
       }
       terminal.onData(onTerminalData)
 
-      // 监听 resize
+      // Listen for resize
       let resizeRequest: number
       const ro = new ResizeObserver(() => {
         cancelAnimationFrame(resizeRequest)
@@ -120,9 +143,9 @@ export default function TermCom({ termId }: Props) {
 
     return () => {
       clearTimeout(timeout);
-      // 清除xtermIO监听, 清除窗口大小变化监听
+      // Clean up xtermIO listeners, window resize listeners
       cleaner.forEach(fn => fn());
-      // 关闭xterm
+      // Dispose xterm
       terminal.dispose()
     }
   }, [termId])
