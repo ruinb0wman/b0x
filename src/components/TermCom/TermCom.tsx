@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
+import { ClipboardAddon } from '@xterm/addon-clipboard' // Import ClipboardAddon
 import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
 import { useTerminalStore } from '@/store/terminalStore/terminalStore'
@@ -29,6 +30,7 @@ export default function TermCom({ termId }: Props) {
     // 添加插件
     const fitAddon = new FitAddon()
     terminal.loadAddon(fitAddon)
+    terminal.loadAddon(new ClipboardAddon()); // Load ClipboardAddon
 
     try {
       terminal.loadAddon(new WebglAddon())
