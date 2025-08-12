@@ -1,4 +1,3 @@
-import DragWrapper from "@/components/DragWrapper";
 import TilingWM from '@/components/TilingWM';
 import TermCom from "@/components/TermCom/TermCom";
 import WindowTab from "@/components/WindowTab"

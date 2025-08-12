@@ -25,8 +25,8 @@ const terminalWindow = useTerminalWindow({ RENDERER_DIST, VITE_DEV_SERVER_URL, _
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform == 'darwin') return;
+  wins.forEach(win => { win?.removeAllListeners() })
   app.quit()
-  wins.forEach(win => win = null)
 })
 
 app.on('activate', () => {
