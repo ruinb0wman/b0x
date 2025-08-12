@@ -4,7 +4,7 @@ const terminal: ITerminalOptions & ITerminalInitOnlyOptions = {
   cursorBlink: true,
   fontFamily: '"CaskaydiaCove Nerd Font Mono", "Courier New", monospace',
   scrollback: 100,
-  fontSize: 16,
+  fontSize: 18,
   fontWeight: 'normal',
   fontWeightBold: 'bold',
   allowTransparency: true,
