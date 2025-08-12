@@ -116,8 +116,17 @@ export function closePane(draft: WritableDraft<Terminal.TilingWMState>, action: 
     sibling.parentId = gp.id;
   }
 
+  // 清除pane
   delete draft.panes[targetId];
   delete draft.panes[parent.id];
+  // 清除session
+  if (targetPane?.termId) {
+    // const pid = draft.session[targetPane.termId];
+    // 通知electron关闭pty
+    // window.ipcRenderer.invoke('terminal:destroy', pid);
+    delete draft.session[targetPane.termId];
+  }
+
 
   draft.activePaneId = sibling.type === 'Leaf' ? sibling.id : null;
 }

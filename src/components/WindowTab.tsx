@@ -28,7 +28,7 @@ export default function WindowTab() {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.ctrlKey) {
-        if (e.key >= '1' && e.key <= '9') {
+        if (e.key >= '1' && e.key <= '5') {
           const index = parseInt(e.key, 10) - 1;
           if (index >= 0 && index < state.windows.length) {
             dispatch({ type: 'SET_ACTIVE_WINDOW', windowIndex: index });

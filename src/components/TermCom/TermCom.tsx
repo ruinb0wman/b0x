@@ -20,11 +20,11 @@ export default function TermCom({ termId }: Props) {
     if (!terminalRef.current) return
     const container = terminalRef.current
     const cleaner: (() => void)[] = [];
+    let pid: number
 
     // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
     preventShortcutCapture(terminal);
-
 
     // 添加插件
     const fitAddon = new FitAddon()
@@ -48,13 +48,12 @@ export default function TermCom({ termId }: Props) {
       const initialCols = Math.max(terminal.cols, 10)
       const initialRows = Math.max(terminal.rows, 5)
 
-      let backendId: number
 
       // 🔍 检查是否已有该 termId 的 backend session
       console.log('session', activeWindow.session)
       if (activeWindow.session && termId in activeWindow.session) {
-        backendId = activeWindow.session[termId]
-        console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${backendId}`)
+        pid = activeWindow.session[termId]
+        console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${pid}`)
       } else {
         // 🆕 创建新终端
         window.ipcRenderer
@@ -62,7 +61,7 @@ export default function TermCom({ termId }: Props) {
           .then((id: number) => {
             console.log(`New terminal created for termId: ${termId}, backendId: ${id}`)
             dispatch({ type: 'SET_SESSION', termId, pid: id })
-            backendId = id
+            pid = id
             bindTerminalEvents(terminal, id)
           })
           .catch((err: any) => {
@@ -72,8 +71,8 @@ export default function TermCom({ termId }: Props) {
       }
 
       // 绑定事件处理
-      cleaner.push(bindTerminalIO(terminal, backendId));
-      cleaner.push(observeResize(fitAddon, container, terminal, backendId));
+      cleaner.push(bindTerminalIO(terminal, pid));
+      cleaner.push(observeResize(fitAddon, container, terminal, pid));
     }, 100)
 
     function bindTerminalEvents(terminal: Terminal, pid: number) {
@@ -119,8 +118,10 @@ export default function TermCom({ termId }: Props) {
 
     return () => {
       clearTimeout(timeout);
-      terminal.dispose()
+      // 清除xtermIO监听, 清除窗口大小变化监听
       cleaner.forEach(fn => fn());
+      // 关闭xterm
+      terminal.dispose()
     }
   }, [termId])
 

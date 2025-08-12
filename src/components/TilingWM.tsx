@@ -14,6 +14,7 @@ export default function TilingWM({ renderPaneContent }: Props) {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    console.log('handleKeyDown', e);
     const activeWindow = state.windows[state.activeWindowIndex];
     if (!activeWindow.activePaneId) return;
 

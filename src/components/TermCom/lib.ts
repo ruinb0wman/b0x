@@ -18,8 +18,6 @@ export function bindTerminalIO(terminal: Terminal, pid: number) {
   }
   terminal.onData(onTerminalData)
 
-
-
   // 返回清理函数
   return () => {
     window.ipcRenderer.off('terminal:data', onData)
@@ -60,6 +58,8 @@ export function preventShortcutCapture(terminal: Terminal) {
     } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 't') {
+      return false;
+    } else if (event.ctrlKey && event.key.toLowerCase() == 'tab') {
       return false;
     }
     return true

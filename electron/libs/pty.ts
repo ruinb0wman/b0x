@@ -1,13 +1,13 @@
+import type { IPty } from "node-pty";
 import { spawn } from 'node-pty'
 import { ipcMain, BrowserWindow } from 'electron'
 
 export function usePty() {
-  const ptys = new Map();
+  const ptys = new Map<number, IPty>();
 
   function init(win: BrowserWindow) {
     // handle create new terminal
     ipcMain.handle('terminal:create', (_, { cols, rows }) => {
-      console.log('[pty:handle terminal:create]')
       const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
       const ptyProcess = spawn(shell, [], {
         name: 'xterm-256color',
@@ -20,9 +20,12 @@ export function usePty() {
           COLORTERM: 'truecolor'
         }
       })
+      console.log('[terminal:create]', ptyProcess.pid)
 
       // Add exit handler
-      ptyProcess.on('exit', () => console.log(`Terminal ${ptyProcess.pid} exited`))
+      ptyProcess.on('exit', () => {
+        console.log(`Terminal ${ptyProcess.pid} exited`)
+      })
 
       // Send data from terminal to renderer
       ptyProcess.on('data', data => {
@@ -52,6 +55,7 @@ export function usePty() {
 
     // handle destroy pty
     ipcMain.handle('terminal:destroy', (_, id) => {
+      console.log('[terminal:destroy]', id)
       const pty = ptys.get(id)
       if (pty) {
         pty.kill()
