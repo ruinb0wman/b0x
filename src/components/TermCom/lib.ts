@@ -21,7 +21,6 @@ export function bindTerminalIO(terminal: Terminal, pid: number) {
   // 返回清理函数
   return () => {
     window.ipcRenderer.off('terminal:data', onData)
-    terminal.offData(onTerminalData) // Ensure to offData as well
   }
 }
 
@@ -50,14 +49,6 @@ export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, ter
 
 export function preventShortcutCapture(terminal: Terminal) {
   terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-    // Allow Ctrl+C and Ctrl+V to be handled by xterm.js and ClipboardAddon.
-    // The ClipboardAddon will handle copy/paste when text is selected.
-    // If no text is selected, Ctrl+C will be sent to the terminal process (SIGINT).
-    if (event.ctrlKey && (event.key.toLowerCase() === 'c' || event.key.toLowerCase() === 'v')) {
-      return true; // Allow xterm.js to handle these keys
-    }
-
-    // Existing shortcut captures that we still want to prevent from reaching the terminal
     if (
       (event.ctrlKey || event.altKey) &&
       event.shiftKey &&
@@ -70,6 +61,15 @@ export function preventShortcutCapture(terminal: Terminal) {
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 'tab') {
       return false;
+    } else if (event.ctrlKey) {
+      if (event.key.toLowerCase() === 'c') {
+        if (terminal.hasSelection()) {
+          return false; // Prevent xterm.js from sending Ctrl+C to the shell
+        }
+        return true;
+      } else if (event.key.toLowerCase() === 'v') {
+        return true;
+      }
     }
     return true // Allow other keys to pass through by default
   })

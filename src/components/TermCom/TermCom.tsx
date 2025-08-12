@@ -44,26 +44,6 @@ export default function TermCom({ termId }: Props) {
     // Open terminal
     terminal.open(container)
 
-    // Custom key event handler for copy/paste
-    terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-      if (event.ctrlKey) {
-        if (event.key.toLowerCase() === 'c') {
-          if (terminal.hasSelection()) {
-            // If text is selected, copy it
-            document.execCommand('copy'); // Use native copy command
-            return false; // Prevent xterm.js from sending Ctrl+C to the shell
-          }
-          // If no text is selected, allow Ctrl+C to pass through to send interrupt
-          return true;
-        } else if (event.key.toLowerCase() === 'v') {
-          // Allow Ctrl+V to pass through for paste (ClipboardAddon handles this)
-          return true;
-        }
-      }
-      return true; // Allow other keys to pass through
-    });
-
-
     // Force layout
     const timeout = setTimeout(() => {
       if (!container || !fitAddon) return
