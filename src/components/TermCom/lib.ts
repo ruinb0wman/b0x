@@ -54,22 +54,30 @@ export function preventShortcutCapture(terminal: Terminal) {
       event.shiftKey &&
       ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
     ) {
-      return false // Prevent these specific shortcuts
+      // 分屏
+      return false
     } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
+      // 关闭pane
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 't') {
+      // 新建window
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 'tab') {
+      // 切换pane
       return false;
     } else if (event.ctrlKey) {
+      // 复制粘贴
       if (event.key.toLowerCase() === 'c') {
         if (terminal.hasSelection()) {
-          return false; // Prevent xterm.js from sending Ctrl+C to the shell
+          return false;
         }
         return true;
       } else if (event.key.toLowerCase() === 'v') {
         return true;
       }
+    } else if (event.ctrlKey && event.shiftKey && event.key.toLocaleLowerCase() == 'i') {
+      // 打开devtool
+      return false
     }
     return true // Allow other keys to pass through by default
   })
