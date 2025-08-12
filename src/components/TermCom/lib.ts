@@ -61,6 +61,8 @@ export function preventShortcutCapture(terminal: Terminal) {
       return false;
     } else if (event.ctrlKey && event.key.toLowerCase() == 'tab') {
       return false;
+    } else if (event.ctrlKey && event.key.toLowerCase() == 'c') {
+      return false;
     }
     return true
   })
