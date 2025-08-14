@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
-import { ClipboardAddon } from '@xterm/addon-clipboard' // Import ClipboardAddon
 import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
 import { useTerminalStore } from '@/store/terminalStore/terminalStore'
@@ -25,15 +24,11 @@ export default function TermCom({ termId }: Props) {
 
     // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
-    // We will handle Ctrl+C/V directly in this component's useEffect
-    // so we don't need preventShortcutCapture to specifically allow them.
-    // It will still prevent other shortcuts.
     preventShortcutCapture(terminal);
 
     // 添加插件
     const fitAddon = new FitAddon()
     terminal.loadAddon(fitAddon)
-    terminal.loadAddon(new ClipboardAddon()); // Load ClipboardAddon
 
     try {
       terminal.loadAddon(new WebglAddon())

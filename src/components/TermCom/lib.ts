@@ -47,38 +47,50 @@ export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, ter
   }
 }
 
+
 export function preventShortcutCapture(terminal: Terminal) {
   terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
-    if (
-      (event.ctrlKey || event.altKey) &&
-      event.shiftKey &&
-      ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)
-    ) {
-      // 分屏
-      return false
-    } else if (event.ctrlKey && event.key.toLowerCase() == 'w') {
-      // 关闭pane
+    const key = event.key.toLowerCase();
+
+    // === 分屏快捷键 ===
+    if ((event.ctrlKey || event.altKey) && event.shiftKey && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
       return false;
-    } else if (event.ctrlKey && event.key.toLowerCase() == 't') {
-      // 新建window
-      return false;
-    } else if (event.ctrlKey && event.key.toLowerCase() == 'tab') {
-      // 切换pane
-      return false;
-    } else if (event.ctrlKey) {
-      // 复制粘贴
-      if (event.key.toLowerCase() === 'c') {
-        if (terminal.hasSelection()) {
-          return false;
-        }
-        return true;
-      } else if (event.key.toLowerCase() === 'v') {
-        return true;
-      }
-    } else if (event.ctrlKey && event.shiftKey && event.key.toLocaleLowerCase() == 'i') {
-      // 打开devtool
-      return false
     }
-    return true // Allow other keys to pass through by default
-  })
+    // === 关闭 Pane ===
+    if (event.ctrlKey && key === 'w') {
+      return false;
+    }
+    // === 新建 Window ===
+    if (event.ctrlKey && key === 't') {
+      return false;
+    }
+    // === 切换 Pane ===
+    if (event.ctrlKey && key === 'tab') {
+      return false;
+    }
+    // === 打开 DevTool ===
+    if (event.ctrlKey && event.shiftKey && key === 'i') {
+      return false;
+    }
+
+    // === 复制逻辑 ===
+    if ((event.ctrlKey && key === 'c') || (event.ctrlKey && event.shiftKey && key === 'c')) {
+      if (terminal.hasSelection()) {
+        const text = terminal.getSelection();
+        navigator.clipboard.writeText(text).catch(err => {
+          console.error("Failed to copy:", err);
+        });
+        return false; // 阻止默认 Ctrl+C / SIGINT
+      }
+      return true; // 没有选区时，允许 SIGINT
+    }
+
+    // === 粘贴逻辑 ===
+    if ((event.ctrlKey && key === 'v') || (event.ctrlKey && event.shiftKey && key === 'v')) {
+      return false; // 阻止默认行为（避免 WSL quoted-insert）
+    }
+
+    return true; // 其他按键放行
+  });
 }
+

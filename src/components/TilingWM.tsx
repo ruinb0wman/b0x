@@ -76,18 +76,18 @@ export default function TilingWM({ renderPaneContent }: Props) {
             width: '100%',
             height: '100%',
             flex: pane.flex || 1,
-            boxSizing: 'border-box',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            padding: '5px',
             backgroundColor: '#1a1b26',
           }}
           data-id={pane.id}
         >
           <div
             style={{
+              padding: '5px',
+              boxSizing: 'border-box',
               top: 0,
               left: 0,
               right: 0,

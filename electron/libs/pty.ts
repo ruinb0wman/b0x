@@ -8,7 +8,7 @@ export function usePty() {
   function init(win: BrowserWindow) {
     // handle create new terminal
     ipcMain.handle('terminal:create', (_, { cols, rows }) => {
-      const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash'
+      const shell = process.platform === 'win32' ? 'wsl.exe' : 'bash'
       const ptyProcess = spawn(shell, [], {
         name: 'xterm-256color',
         cols: cols || 80,
