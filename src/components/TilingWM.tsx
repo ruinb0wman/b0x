@@ -47,10 +47,18 @@ export default function TilingWM({ renderPaneContent }: Props) {
       }
     } else if (e.ctrlKey && e.key === 'w') {
       e.preventDefault();
-      dispatch({
-        type: 'CLOSE_PANE',
-        targetId: activeWindow.activePaneId,
-      });
+      // Check if the current window has only one pane and there are multiple windows
+      if (Object.keys(activeWindow.panes).length === 1 && state.windows.length > 1) {
+        dispatch({
+          type: 'CLOSE_WINDOW',
+          windowIndex: state.activeWindowIndex,
+        });
+      } else {
+        dispatch({
+          type: 'CLOSE_PANE',
+          targetId: activeWindow.activePaneId,
+        });
+      }
     }
   };
 
