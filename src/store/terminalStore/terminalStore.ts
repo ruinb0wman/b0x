@@ -5,7 +5,7 @@ import { createTerm, createPane, attachPane, resizePane, closePane } from './lib
 
 type Store = {
   state: Terminal.WindowTabState;
-  dispatch: (action: Terminal.TilingWMAction | { type: 'SET_ACTIVE_WINDOW', windowIndex: number } | { type: 'NEW_WINDOW' }) => void;
+  dispatch: (action: Terminal.TilingWMAction | { type: 'SET_ACTIVE_WINDOW', windowIndex: number } | { type: 'NEW_WINDOW' } | { type: 'CLOSE_WINDOW', windowIndex: number }) => void;
 };
 
 // 初始化 state
@@ -41,6 +41,22 @@ export const useTerminalStore = create<Store>()(
             if (action.type === 'NEW_WINDOW') {
               draft.state.windows.push(genTilingState());
               draft.state.activeWindowIndex = draft.state.windows.length - 1;
+              return;
+            }
+            if (action.type === 'CLOSE_WINDOW') {
+              const { windowIndex } = action;
+              if (draft.state.windows.length > 1) {
+                // Close all pty sessions for the window being closed
+                const windowToClose = draft.state.windows[windowIndex];
+                Object.values(windowToClose.session).forEach(pid => {
+                  window.ipcRenderer.invoke('terminal:destroy', pid);
+                });
+
+                draft.state.windows.splice(windowIndex, 1);
+                if (draft.state.activeWindowIndex >= draft.state.windows.length) {
+                  draft.state.activeWindowIndex = draft.state.windows.length - 1;
+                }
+              }
               return;
             }
 
