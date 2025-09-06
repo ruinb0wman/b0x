@@ -52,7 +52,7 @@ export function preventShortcutCapture(terminal: Terminal) {
   terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
     const key = event.key.toLowerCase();
 
-    // === 分屏快捷键 ===
+    // === 分屏及分屏尺寸快捷键 ===
     if ((event.ctrlKey || event.altKey) && event.shiftKey && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
       return false;
     }
@@ -64,8 +64,12 @@ export function preventShortcutCapture(terminal: Terminal) {
     if (event.ctrlKey && key === 't') {
       return false;
     }
-    // === 切换 Pane ===
+    // === 轮换 Pane ===
     if (event.ctrlKey && key === 'tab') {
+      return false;
+    }
+    // 切换 Pane
+    if (event.ctrlKey && /\d/.test(key)) {
       return false;
     }
     // === 打开 DevTool ===
