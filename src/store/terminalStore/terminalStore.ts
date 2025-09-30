@@ -87,17 +87,17 @@ export const useTerminalStore = create<Store>()(
 );
 
 // 在页面关闭时清除session, 确保下次打开时能创建新的pty进程
-window.ipcRenderer.on('window-close', () => {
-  const currentState = { ...useTerminalStore.getState().state };
-  currentState.windows = currentState.windows.map((w) => {
-    // 通知electron关闭pty
-    Object.values(w.session).forEach(pid => {
-      window.ipcRenderer.invoke('terminal:destroy', pid);
-    })
-    return {
-      ...w,
-      session: {}
-    }
-  });
-  useTerminalStore.setState({ state: currentState });
-});
+// window.ipcRenderer.on('window-close', () => {
+//   const currentState = { ...useTerminalStore.getState().state };
+//   currentState.windows = currentState.windows.map((w) => {
+//     // 通知electron关闭pty
+//     Object.values(w.session).forEach(pid => {
+//       window.ipcRenderer.invoke('terminal:destroy', pid);
+//     })
+//     return {
+//       ...w,
+//       session: {}
+//     }
+//   });
+//   useTerminalStore.setState({ state: currentState });
+// });
