@@ -45,6 +45,6 @@ app.whenReady().then(() => {
     const pty = usePty();
     pty.init(win);
     useLifeCircle(win);
-    useOperation(win);
+    useOperation(win); // Pass the main window to useOperation
   })
 })
