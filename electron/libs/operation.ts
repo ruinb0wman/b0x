@@ -1,11 +1,11 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import { useAiWindow } from './aiWindow'; // Assuming aiWindow.ts will be in the same directory
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+// import { fileURLToPath } from 'node:url';
 
 // This is needed because __dirname is not directly available in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 export function useOperation(win: BrowserWindow) {
   ipcMain.handle('open-devtool', () => {
