@@ -3,7 +3,7 @@ import type { ITerminalOptions, ITerminalInitOnlyOptions } from '@xterm/xterm';
 const terminal: ITerminalOptions & ITerminalInitOnlyOptions = {
   cursorBlink: true,
   fontFamily: '"CaskaydiaCove Nerd Font Mono", "Courier New", monospace',
-  scrollback: 100,
+  scrollback: 1000,
   fontSize: 18,
   fontWeight: 'normal',
   fontWeightBold: 'bold',

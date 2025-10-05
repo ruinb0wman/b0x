@@ -50,7 +50,6 @@ export default function TermCom({ termId }: Props) {
 
 
       // 🔍 Check if there's an existing backend session for this termId
-      console.log('session', activeWindow.session)
       if (activeWindow.session && termId in activeWindow.session) {
         pid = activeWindow.session[termId]
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${pid}`)
