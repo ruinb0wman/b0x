@@ -84,7 +84,6 @@ export default function TermCom({ termId }: Props) {
       style={{
         width: '100%',
         height: '100%',
-        minHeight: '300px',
         overflow: 'hidden',
         position: 'relative',
         padding: '5px',
