@@ -40,7 +40,7 @@ export default function TermCom({ termId }: Props) {
     terminal.open(container)
 
     // Force layout
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(async () => {
       if (!container || !fitAddon) return
       fitAddon.fit()
       const activeWindow = state.windows[state.activeWindowIndex];
@@ -56,65 +56,19 @@ export default function TermCom({ termId }: Props) {
         console.log(`Reusing existing terminal session for termId: ${termId}, backendId: ${pid}`)
       } else {
         // 🆕 Create new terminal
-        window.ipcRenderer
+        const id = await window.ipcRenderer
           .invoke('terminal:create', { cols: initialCols, rows: initialRows })
-          .then((id: number) => {
-            console.log(`New terminal created for termId: ${termId}, backendId: ${id}`)
-            dispatch({ type: 'SET_SESSION', termId, pid: id })
-            pid = id
-            bindTerminalEvents(terminal, id)
-          })
           .catch((err: any) => {
             console.error('Failed to create terminal:', err)
-          })
-        return
+          });
+        console.log(`New terminal created for termId: ${termId}, backendId: ${id}`)
+        dispatch({ type: 'SET_SESSION', termId, pid: id })
+        pid = id
       }
-
       // Bind event handlers
       cleaner.push(bindTerminalIO(terminal, pid));
       cleaner.push(observeResize(fitAddon, container, terminal, pid));
     }, 100)
-
-    function bindTerminalEvents(terminal: Terminal, pid: number) {
-      // Listen for backend output
-      const onData = (_: any, dataObj: any) => {
-        if (dataObj.id === pid && terminal) {
-          terminal.write(dataObj.data)
-        }
-      }
-      window.ipcRenderer.on('terminal:data', onData)
-
-      // Listen for user input
-      const onTerminalData = (data: string) => {
-        window.ipcRenderer.invoke('terminal:write', { id: pid, data }).catch((err) => {
-          console.error('Failed to write to terminal:', err)
-        })
-      }
-      terminal.onData(onTerminalData)
-
-      // Listen for resize
-      let resizeRequest: number
-      const ro = new ResizeObserver(() => {
-        cancelAnimationFrame(resizeRequest)
-        resizeRequest = requestAnimationFrame(() => {
-          if (fitAddon && container && terminal) {
-            try {
-              fitAddon.fit()
-              const { cols, rows } = terminal
-              window.ipcRenderer.invoke('terminal:resize', { id: pid, cols, rows })
-            } catch (e) {
-              console.error('Resize error:', e)
-            }
-          }
-        })
-      })
-      ro.observe(container)
-
-      return () => {
-        window.ipcRenderer.off('terminal:data', onData)
-        ro.disconnect()
-      }
-    }
 
     return () => {
       clearTimeout(timeout);
