@@ -13,7 +13,8 @@
   ],
   "win": {
     "target": ["zip"],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}",
+    "icon": "public/terminal.ico"
   },
   "mac": false,
   "linux": {
