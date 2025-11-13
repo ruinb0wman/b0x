@@ -1,19 +1,16 @@
 import { BrowserWindow, screen } from "electron"
 import path from 'node:path'
+import { VITE_DEV_SERVER_URL, RENDERER_DIST, __dirname } from "../../libs/env";
+import { registerOperation, registerShortcuts } from "./shortcuts";
 
-interface Props {
-  VITE_DEV_SERVER_URL?: string
-  RENDERER_DIST: string
-  __dirname: string
-}
+let win: null | BrowserWindow;
 
-export function useAiWindow({ VITE_DEV_SERVER_URL, RENDERER_DIST, __dirname }: Props) {
-  let win: null | BrowserWindow;
-
+export function useAiWindow() {
   function createWindow(cb?: (win: BrowserWindow) => void) {
+    if (win) return win;
+
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.workAreaSize;
-
     const windowWidth = Math.floor(width / 3);
     const windowX = width - windowWidth;
 
@@ -30,6 +27,7 @@ export function useAiWindow({ VITE_DEV_SERVER_URL, RENDERER_DIST, __dirname }: P
       webPreferences: {
         preload: path.join(__dirname, 'preload.mjs'),
         devTools: true,
+        webviewTag: true
       },
     })
 
@@ -41,9 +39,18 @@ export function useAiWindow({ VITE_DEV_SERVER_URL, RENDERER_DIST, __dirname }: P
     }
 
     cb && cb(win);
+    win.on('closed', () => {
+      win = null;
+    })
 
     return win;
   }
 
-  return { createWindow }
+  function init() {
+    if (win) return;
+    registerOperation(createWindow);
+    registerShortcuts(createWindow);
+  }
+
+  return { win, init }
 }
