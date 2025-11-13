@@ -19,9 +19,9 @@ export function bindTerminalIO(terminal: Terminal, pid: number) {
   terminal.onData(onTerminalData)
 
   // 返回清理函数
-  // return () => {
-  //   window.ipcRenderer.off('terminal:data', onData)
-  // }
+  return () => {
+    // window.ipcRenderer.off('terminal:data', onData)
+  }
 }
 
 export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, terminal: Terminal, pid: number) {

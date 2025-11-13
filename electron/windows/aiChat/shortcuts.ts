@@ -20,7 +20,11 @@ function toggleWin(createWindow: (cb?: (win: BrowserWindow) => void) => BrowserW
   if (win.isVisible()) {
     win.hide()
   } else {
-    win.show()
-    win.focus()
+    if (win.isFocusable()) {
+      win.focus();
+    } else {
+      win.show()
+      win.focus()
+    }
   }
 }
