@@ -59,6 +59,12 @@ export default function TilingWM({ renderPaneContent }: Props) {
           targetId: activeWindow.activePaneId,
         });
       }
+    } else if (e.ctrlKey && e.key === 'Tab') {
+      e.preventDefault();
+      dispatch({
+        type: 'CYCLE_PANE',
+        direction: e.shiftKey ? 'previous' : 'next', // Ctrl+Shift+Tab goes to previous pane
+      });
     }
   };
 

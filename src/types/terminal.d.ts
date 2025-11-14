@@ -37,7 +37,8 @@ declare namespace Terminal {
     | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
     | { type: 'CLOSE_PANE'; targetId: string }
     | { type: 'SET_SESSION'; termId: string, pid: number }
-    | { type: 'SET_FOCUSED_TERM'; termId: string | null };
+    | { type: 'SET_FOCUSED_TERM'; termId: string | null }
+    | { type: 'CYCLE_PANE'; direction: 'next' | 'previous' };
 
   interface WindowTabState {
     windows: TilingWMState[];

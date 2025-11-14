@@ -84,6 +84,49 @@ export const useTerminalStore = create<Store>()(
             case 'SET_FOCUSED_TERM':
               draft.state.windows[activeIndex].focusedTermId = action.termId;
               break;
+
+            case 'CYCLE_PANE':
+              // Get all leaf panes in the current window in document order
+              const allPanes = draft.state.windows[activeIndex].panes;
+              const rootPaneId = draft.state.windows[activeIndex].rootPaneId;
+
+              // Traverse the pane tree to get all leaf panes in document order
+              const getLeafPanesInOrder = (paneId: string): Terminal.PaneNode[] => {
+                const pane = allPanes[paneId];
+                if (!pane) return [];
+
+                if (pane.type === 'Leaf' && pane.termId) {
+                  return [pane];
+                }
+
+                if (pane.type !== 'Leaf') {
+                  let result: Terminal.PaneNode[] = [];
+                  pane.childrenId.forEach(childId => {
+                    result = result.concat(getLeafPanesInOrder(childId));
+                  });
+                  return result;
+                }
+
+                return [];
+              };
+
+              const leafPanes = getLeafPanesInOrder(rootPaneId);
+
+              if (leafPanes.length <= 1) break; // No need to cycle if there's only one or no pane
+
+              const currentIndex = leafPanes.findIndex(pane => pane.id === draft.state.windows[activeIndex].activePaneId);
+              let nextIndex;
+
+              if (action.direction === 'next') {
+                nextIndex = (currentIndex + 1) % leafPanes.length;
+              } else { // previous
+                nextIndex = (currentIndex - 1 + leafPanes.length) % leafPanes.length;
+              }
+
+              if (nextIndex >= 0 && nextIndex < leafPanes.length) {
+                draft.state.windows[activeIndex].activePaneId = leafPanes[nextIndex].id;
+              }
+              break;
           }
         })
       );
