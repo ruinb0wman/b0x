@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
@@ -16,15 +16,6 @@ export default function TermCom({ termId }: Props) {
   const terminalRef = useRef<HTMLDivElement>(null)
   const xtermRef = useRef<Terminal | null>(null)
   const { state, dispatch } = useTerminalStore();
-
-  // Function to focus the terminal
-  const focusTerminal = useCallback(() => {
-    if (xtermRef.current) {
-      xtermRef.current.focus();
-      // Update the focused terminal in the store
-      dispatch({ type: 'SET_FOCUSED_TERM', termId });
-    }
-  }, [dispatch]);
 
   // Effect to handle focusing when the window changes and this terminal was the last focused
   useEffect(() => {
