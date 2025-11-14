@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
@@ -14,7 +14,48 @@ interface Props {
 
 export default function TermCom({ termId }: Props) {
   const terminalRef = useRef<HTMLDivElement>(null)
+  const xtermRef = useRef<Terminal | null>(null)
   const { state, dispatch } = useTerminalStore();
+
+  // Function to focus the terminal
+  const focusTerminal = useCallback(() => {
+    if (xtermRef.current) {
+      xtermRef.current.focus();
+      // Update the focused terminal in the store
+      dispatch({ type: 'SET_FOCUSED_TERM', termId });
+    }
+  }, [dispatch]);
+
+  // Effect to handle focusing when the window changes and this terminal was the last focused
+  useEffect(() => {
+    const activeWindow = state.windows[state.activeWindowIndex];
+
+    // If this terminal is the one that was focused in the current window, focus it
+    if (activeWindow.focusedTermId === termId && xtermRef.current) {
+      // Use setTimeout to ensure DOM is ready before focusing
+      setTimeout(() => {
+        xtermRef.current?.focus();
+      }, 0);
+    }
+  }, [state.activeWindowIndex, state.windows, termId]);
+
+  // Effect to handle focusing when this pane becomes the active pane within the current window
+  useEffect(() => {
+    const activeWindow = state.windows[state.activeWindowIndex];
+    const targetPane = Object.values(activeWindow.panes).find(pane => pane.termId === termId);
+
+    // If this terminal's pane becomes the active pane, focus the terminal and update focusedTermId
+    if (targetPane && activeWindow.activePaneId === targetPane.id && xtermRef.current) {
+      // Use setTimeout to ensure DOM is ready before focusing
+      setTimeout(() => {
+        if (xtermRef.current) {
+          xtermRef.current.focus();
+          // Update the store to track this as the focused terminal
+          dispatch({ type: 'SET_FOCUSED_TERM', termId });
+        }
+      }, 0);
+    }
+  }, [state.activeWindowIndex, state.windows, termId, dispatch]);
 
   useEffect(() => {
     if (!terminalRef.current) return
@@ -25,6 +66,7 @@ export default function TermCom({ termId }: Props) {
     // 创建 xterm 实例
     const terminal = new Terminal(config.terminal)
     preventShortcutCapture(terminal);
+    xtermRef.current = terminal;
 
     // 添加插件
     const fitAddon = new FitAddon()
@@ -64,6 +106,14 @@ export default function TermCom({ termId }: Props) {
         dispatch({ type: 'SET_SESSION', termId, pid: id })
         pid = id
       }
+
+      // If this is the first terminal in the window or the window has no focused terminal,
+      // set it as the focused terminal
+      if (!activeWindow.focusedTermId) {
+        dispatch({ type: 'SET_FOCUSED_TERM', termId });
+        terminal.focus();
+      }
+
       // Bind event handlers
       cleaner.push(bindTerminalIO(terminal, pid));
       cleaner.push(observeResize(fitAddon, container, terminal, pid));
@@ -75,8 +125,11 @@ export default function TermCom({ termId }: Props) {
       cleaner.forEach(fn => fn());
       // Dispose xterm
       terminal.dispose()
+      if (xtermRef.current === terminal) {
+        xtermRef.current = null;
+      }
     }
-  }, [termId])
+  }, [termId, dispatch])
 
   return (
     <div

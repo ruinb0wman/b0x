@@ -47,6 +47,7 @@ export function attachPane(draft: WritableDraft<Terminal.TilingWMState>, action:
       : [copyId, newPane.id];
 
   draft.activePaneId = newPane.id;
+  draft.focusedTermId = newTerm.id; // Focus the terminal in the newly created pane
 }
 
 export function resizePane(draft: WritableDraft<Terminal.TilingWMState>, action: Terminal.TilingWMAction) {
@@ -129,6 +130,16 @@ export function closePane(draft: WritableDraft<Terminal.TilingWMState>, action: 
   delete draft.panes[targetId];
   delete draft.panes[parent.id];
 
-
   draft.activePaneId = sibling.type === 'Leaf' ? sibling.id : null;
+
+  // If the closed pane was the focused terminal, update focusedTermId
+  if (draft.focusedTermId === targetPane.termId) {
+    // Set focus to the remaining sibling's terminal if it has one
+    if (sibling.termId) {
+      draft.focusedTermId = sibling.termId;
+    } else {
+      // If the sibling is a container, set focus to null or find another terminal in the window
+      draft.focusedTermId = null;
+    }
+  }
 }
