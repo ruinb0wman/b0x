@@ -4,7 +4,7 @@ import { FitAddon } from '@xterm/addon-fit'
 import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
 import config from '@/config'
-import { useTerminalStore } from '@/store/terminalStore/terminalStore'
+import { useTerminalStore } from '../../stores/TerminalStore'
 import { bindTerminalIO, observeResize, preventShortcutCapture } from "./lib"
 import "./style.css"
 

@@ -47,7 +47,7 @@ export function observeResize(fitAddon: FitAddon, container: HTMLDivElement, ter
   }
 }
 
-
+// 阻止xterm捕获快捷键
 export function preventShortcutCapture(terminal: Terminal) {
   terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
     const key = event.key.toLowerCase();

@@ -1,4 +1,4 @@
-import { useTerminalStore } from '@/store/terminalStore/terminalStore'
+import { useTerminalStore } from '../../stores/TerminalStore'
 import { useEffect } from 'react';
 
 export default function WindowTab() {

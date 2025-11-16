@@ -143,3 +143,63 @@ export function closePane(draft: WritableDraft<Terminal.TilingWMState>, action: 
     }
   }
 }
+
+export function cyclePane(draft: WritableDraft<Terminal.TilingWMState>, action: Terminal.TilingWMAction) {
+  if (action.type != 'CYCLE_PANE') return;
+  // Get all leaf panes in the current window in document order
+  const allPanes = draft.panes;
+  const rootPaneId = draft.rootPaneId;
+
+  const leafPanes = getLeafPanesInOrder(allPanes, rootPaneId);
+  // No need to cycle if there's only one or no pane
+  if (leafPanes.length <= 1) return;
+
+  const currentIndex = leafPanes.findIndex(pane => pane.id === draft.activePaneId);
+  let nextIndex;
+
+  if (action.direction === 'next') {
+    nextIndex = (currentIndex + 1) % leafPanes.length;
+  } else { // previous
+    nextIndex = (currentIndex - 1 + leafPanes.length) % leafPanes.length;
+  }
+
+  if (nextIndex >= 0 && nextIndex < leafPanes.length) {
+    draft.activePaneId = leafPanes[nextIndex].id;
+  }
+}
+
+export function closeWindow(draft: WritableDraft<Terminal.WindowTabState>, action: Terminal.TilingWMAction) {
+  if (action.type != 'CLOSE_WINDOW') return;
+  const { windowIndex } = action;
+  if (draft.windows.length > 1) {
+    // Close all pty sessions for the window being closed
+    const windowToClose = draft.windows[windowIndex];
+    Object.values(windowToClose.session).forEach(pid => {
+      window.ipcRenderer.invoke('terminal:destroy', pid);
+    });
+
+    draft.windows.splice(windowIndex, 1);
+    if (draft.activeWindowIndex >= draft.windows.length) {
+      draft.activeWindowIndex = draft.windows.length - 1;
+    }
+  }
+}
+
+function getLeafPanesInOrder(allPanes: WritableDraft<Record<string, Terminal.PaneNode>>, paneId: string): Terminal.PaneNode[] {
+  const pane = allPanes[paneId];
+  if (!pane) return [];
+
+  if (pane.type === 'Leaf' && pane.termId) {
+    return [pane];
+  }
+
+  if (pane.type !== 'Leaf') {
+    let result: Terminal.PaneNode[] = [];
+    pane.childrenId.forEach(childId => {
+      result = result.concat(getLeafPanesInOrder(allPanes, childId));
+    });
+    return result;
+  }
+
+  return [];
+}
