@@ -15,7 +15,6 @@ function genTilingState() {
     panes: { [rootPane.id]: rootPane },
     rootPaneId: rootPane.id,
     activePaneId: rootPane.id,  // Set the initial pane as active
-    focusedTermId: null,
     // termId -> node-pty process id(pid)
     session: {}
   };
@@ -61,9 +60,9 @@ export const useTerminalStore = create<Store>()(
             case 'SET_SESSION':
               draft.state.windows[activeIndex].session[action.termId] = action.pid;
               break;
-            case 'SET_FOCUSED_TERM':
-              draft.state.windows[activeIndex].focusedTermId = action.termId;
-              break;
+            // case 'SET_FOCUSED_TERM':
+            //   draft.state.windows[activeIndex].focusedTermId = action.termId;
+            //   break;
             case 'CYCLE_PANE':
               cyclePane(draft.state.windows[activeIndex], action);
               break;

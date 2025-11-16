@@ -27,7 +27,6 @@ declare namespace Terminal {
     panes: Record<string, PaneNode>; // 扁平化存储所有Pane
     rootPaneId: string;              // 根Pane ID
     activePaneId: string | null;
-    focusedTermId: string | null;    // 当前窗口聚焦的终端ID
     session: Record<string, number>
   }
 
@@ -37,7 +36,6 @@ declare namespace Terminal {
     | { type: 'RESIZE_PANE'; targetId: string; direction: 'left' | 'right' | 'up' | 'down' }
     | { type: 'CLOSE_PANE'; targetId: string }
     | { type: 'SET_SESSION'; termId: string, pid: number }
-    | { type: 'SET_FOCUSED_TERM'; termId: string | null }
     | { type: 'CYCLE_PANE'; direction: 'next' | 'previous' }
     | { type: 'SET_ACTIVE_WINDOW', windowIndex: number }
     | { type: 'NEW_WINDOW' } | { type: 'CLOSE_WINDOW', windowIndex: number };
