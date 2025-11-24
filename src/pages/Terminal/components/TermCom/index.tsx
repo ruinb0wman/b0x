@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
-import { WebglAddon } from '@xterm/addon-webgl'
+// import { WebglAddon } from '@xterm/addon-webgl'
 import '@xterm/xterm/css/xterm.css'
-import config from '@/config'
+import { TERMINAL_TEMPLATE } from '../../constants'
 import { useTerminalStore } from '../../stores/TerminalStore'
 import { bindTerminalIO, observeResize, preventShortcutCapture } from "./lib"
 import "./style.css"
@@ -39,7 +39,7 @@ export default function TermCom({ termId }: Props) {
     let pid: number
 
     // 创建 xterm 实例
-    const terminal = new Terminal(config.terminal)
+    const terminal = new Terminal(TERMINAL_TEMPLATE)
     preventShortcutCapture(terminal);
     xtermRef.current = terminal;
 
@@ -47,11 +47,11 @@ export default function TermCom({ termId }: Props) {
     const fitAddon = new FitAddon()
     terminal.loadAddon(fitAddon)
 
-    try {
-      terminal.loadAddon(new WebglAddon())
-    } catch (e) {
-      console.warn('WebGL addon could not be loaded, falling back to canvas renderer')
-    }
+    // try {
+    //   terminal.loadAddon(new WebglAddon())
+    // } catch (e) {
+    //   console.warn('WebGL addon could not be loaded, falling back to canvas renderer')
+    // }
 
     // Open terminal
     terminal.open(container)

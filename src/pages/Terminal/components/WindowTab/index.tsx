@@ -1,29 +1,10 @@
+import type { CSSProperties } from 'react';
 import { useTerminalStore } from '../../stores/TerminalStore'
 import { useEffect } from 'react';
+import { TERMINAL_THEME, THEME } from '@/assets/theme';
 
 export default function WindowTab() {
   const { state, dispatch } = useTerminalStore();
-
-  function TabButton({ children, isActive, onClick }: { children: React.ReactNode, isActive: boolean, onClick?: () => void }) {
-    return (
-      <div
-        style={{
-          width: '20px',
-          height: '20px',
-          border: isActive ? '1px solid blue' : '1px solid #fff',
-          fontSize: '10px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          userSelect: 'none'
-        }}
-        onClick={onClick}
-      >
-        {children}
-      </div>
-    );
-  }
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -48,7 +29,7 @@ export default function WindowTab() {
   }, [state.windows.length, dispatch]);
 
   return (
-    <div style={{ display: 'flex', gap: '10px' }}>
+    <div style={styles.container}>
       {state.windows.map((_, i) => {
         return (
           <TabButton
@@ -68,4 +49,35 @@ export default function WindowTab() {
       </TabButton>
     </div>
   );
+}
+
+function TabButton({ children, isActive, onClick }: { children: React.ReactNode, isActive: boolean, onClick?: () => void }) {
+  return (
+    <div style={styles.tabButton(isActive)} onClick={onClick} >
+      {children}
+    </div>
+  );
+}
+
+const styles: {
+  container: CSSProperties;
+  tabButton: (isActive: boolean) => CSSProperties;
+} = {
+  container:
+    { display: 'flex', gap: THEME.spacing }
+  ,
+  tabButton(isActive: boolean) {
+    return {
+      width: THEME.font_es * 2,
+      height: THEME.font_es * 2,
+      color: isActive ? TERMINAL_THEME.blue : '#fff',
+      border: '1px solid',
+      fontSize: THEME.font_es,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      userSelect: 'none'
+    }
+  }
 }

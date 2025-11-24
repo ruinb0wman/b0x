@@ -1,3 +1,4 @@
+/*隐藏xterm滚动条*/
 .xterm-viewport::-webkit-scrollbar {
   display: none !important;
 }
