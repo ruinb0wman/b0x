@@ -1,9 +1,9 @@
 export const TERMINAL_THEME = {
-  background: '#1a1b26',   // 背景色
-  foreground: '#c0caf5',   // 默认前景色（普通文字）
-  cursor: '#c0caf5',       // 光标颜色
-  cursorAccent: '#1a1b26', // 光标文字颜色
-  selectionBackground: '#33467c',    // 选中文本背景色
+  background: '#1a1b26',
+  foreground: '#c0caf5',
+  cursor: '#c0caf5',
+  cursorAccent: '#1a1b26',
+  selectionBackground: '#33467c',
 
   black: '#15161e',
   red: '#f7768e',
