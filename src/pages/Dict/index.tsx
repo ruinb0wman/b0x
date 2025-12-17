@@ -1,13 +1,15 @@
 import type { CSSProperties } from "react";
 import Aside from "./components/Aside";
 import Home from "./components/Home";
+import Favorite from "./components/Favorite";
 
 export default function Dict() {
   return (
     <div style={styles.body}>
       <div style={styles.container}>
         <Aside />
-        <Home />
+        {/* <Home /> */}
+        <Favorite />
       </div>
     </div>
   );
