@@ -1,10 +1,12 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import { __dirname } from "./libs/env"
 import { useTerminalWindow, useAiWindow } from "./windows"
+import { useTray } from "./libs/tray";
 
 const wins: (BrowserWindow | null)[] = []
 const terminalWindow = useTerminalWindow();
 const aiWindow = useAiWindow();
+const tray = useTray();
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -25,6 +27,7 @@ app.on('activate', () => {
 
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
+  tray.createTray();
   aiWindow.init();
   terminalWindow.init();
 })
