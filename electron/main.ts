@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import { __dirname } from "./libs/env"
-import { useTerminalWindow, useAiWindow, useMainWindow } from "./windows"
+import { useTerminalWindow, useAiWindow, useMainWindow, useDictWindow } from "./windows"
 import { useTray } from "./libs/tray";
 import { useWindow } from './libs/windows';
 
@@ -8,6 +8,7 @@ import { useWindow } from './libs/windows';
 const terminalWindow = useTerminalWindow();
 const aiWindow = useAiWindow();
 const mainWindow = useMainWindow();
+const dictWindow = useDictWindow();
 const tray = useTray();
 const windows = useWindow();
 
@@ -48,6 +49,11 @@ app.whenReady().then(() => {
     visibleIpc: 'toggle-ai',
     visibleShortCut: 'num7',
     init: aiWindow.init
+  })
+  windows.registerWindow('dict', {
+    visibleIpc: 'toggle-dict',
+    visibleShortCut: 'num9',
+    init: dictWindow.init
   })
   // aiWindow.init();
   // terminalWindow.init();
