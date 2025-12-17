@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import Aside from "./components/Aside";
 import Home from "./components/Home";
 import Favorite from "./components/Favorite";
+import Setting from "./components/Setting";
 
 export default function Dict() {
   return (
@@ -9,7 +10,8 @@ export default function Dict() {
       <div style={styles.container}>
         <Aside />
         {/* <Home /> */}
-        <Favorite />
+        {/* <Favorite /> */}
+        <Setting />
       </div>
     </div>
   );

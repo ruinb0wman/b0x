@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Dictionary Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7aa2f7", 
+                        "primary-dark": "#3d59a1",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#1a1b26",
+                        "card-dark": "#24283b",
+                        "input-dark": "#16161e",
+                        "border-dark": "#414868",
+                        "text-main": "#c0caf5",
+                        "text-muted": "#787c99",
+                        "selection-bg": "#33467c",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; border: 3px solid transparent; background-clip: content-box; }
+        .dark ::-webkit-scrollbar-thumb { background-color: #414868; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb:hover { background-color: #565f89; }::selection { background-color: #33467c; color: #ffffff; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] dark:text-text-main h-screen flex overflow-hidden font-display antialiased transition-colors duration-200">
+<aside class="w-72 bg-white dark:bg-[#16161e] border-r border-[#e5e7eb] dark:border-[#101014] flex flex-col h-full shrink-0 z-20 transition-colors duration-300">
+<div class="p-5 flex flex-col gap-6 h-full">
+<div class="flex flex-col px-3">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-blue-600 dark:text-primary text-[28px]">school</span>
+<h1 class="text-[#111318] dark:text-white text-lg font-bold leading-normal tracking-tight">AI Dictionary</h1>
+</div>
+<p class="text-[#616f89] dark:text-text-muted text-xs font-normal leading-normal pl-9">v1.2.0 • Local Storage</p>
+</div>
+<div class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-selection-bg/30 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#111318] dark:text-text-muted group-hover:text-blue-600 dark:group-hover:text-primary transition-colors">settings</span>
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal">General</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50 dark:bg-selection-bg border border-blue-100 dark:border-transparent" href="#">
+<span class="material-symbols-outlined icon-filled text-blue-600 dark:text-white">neurology</span>
+<p class="text-[#111318] dark:text-white text-sm font-medium leading-normal">AI Configuration</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-selection-bg/30 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#111318] dark:text-text-muted group-hover:text-blue-600 dark:group-hover:text-primary transition-colors">menu_book</span>
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal">Learning Goals</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-selection-bg/30 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#111318] dark:text-text-muted group-hover:text-blue-600 dark:group-hover:text-primary transition-colors">account_circle</span>
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal">Account</p>
+</a>
+</div>
+<div class="mt-auto px-3 py-3 border-t border-[#f0f2f4] dark:border-[#101014] flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-sm" data-alt="User avatar gradient placeholder">JD</div>
+<div class="flex flex-col">
+<p class="text-[#111318] dark:text-white text-sm font-medium">John Doe</p>
+<p class="text-[#616f89] dark:text-text-muted text-xs">Pro Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative bg-background-light dark:bg-background-dark">
+<div class="flex-1 overflow-y-auto w-full">
+<div class="flex flex-col w-full max-w-[1000px] mx-auto px-6 py-8 md:px-12 md:py-10">
+<div class="flex flex-wrap justify-between gap-3 pb-8 border-b border-[#dbdfe6] dark:border-border-dark mb-8">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-[#111318] dark:text-white text-3xl font-black leading-tight tracking-[-0.033em]">Settings</h1>
+<p class="text-[#616f89] dark:text-text-muted text-base font-normal leading-normal">Manage your AI connection and study habits</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-green-100 dark:bg-[#9ece6a]/10 text-green-700 dark:text-[#9ece6a] text-xs font-medium rounded-full border border-green-200 dark:border-[#9ece6a]/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] icon-filled">check_circle</span>
+                            System Operational
+                         </span>
+</div>
+</div>
+<div class="space-y-6">
+<section class="flex flex-col bg-white dark:bg-card-dark rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-[#dbdfe6] dark:border-border-dark overflow-hidden">
+<div class="px-6 py-5 border-b border-[#f0f2f4] dark:border-border-dark flex justify-between items-center">
+<h2 class="text-[#111318] dark:text-text-main text-[20px] font-bold leading-tight tracking-[-0.015em]">AI Configuration</h2>
+<span class="material-symbols-outlined text-[#616f89] dark:text-text-muted">hub</span>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div class="flex flex-col gap-1">
+<label class="flex flex-col w-full">
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal pb-2">AI API URL</p>
+<input class="form-input flex w-full resize-none overflow-hidden rounded-lg text-[#111318] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbdfe6] dark:border-border-dark bg-white dark:bg-input-dark focus:border-blue-500 dark:focus:border-primary h-12 placeholder:text-[#616f89] dark:placeholder:text-text-muted px-4 text-base font-normal leading-normal transition-all" placeholder="e.g., http://localhost:11434" type="url" value="http://localhost:11434"/>
+</label>
+<p class="text-[#616f89] dark:text-text-muted text-xs mt-1">Point this to your local LLM server (e.g., Ollama) or OpenAI endpoint.</p>
+</div>
+<div class="flex flex-col gap-1">
+<label class="flex flex-col w-full relative">
+<div class="flex justify-between items-baseline pb-2">
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal">API Token</p>
+<span class="text-xs text-[#616f89] dark:text-text-muted bg-[#f0f2f4] dark:bg-input-dark px-2 py-0.5 rounded border border-transparent dark:border-border-dark">Stored Locally</span>
+</div>
+<div class="relative">
+<input class="form-input flex w-full resize-none overflow-hidden rounded-lg text-[#111318] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbdfe6] dark:border-border-dark bg-white dark:bg-input-dark focus:border-blue-500 dark:focus:border-primary h-12 placeholder:text-[#616f89] dark:placeholder:text-text-muted px-4 pr-12 text-base font-normal leading-normal transition-all" type="password" value="sk-xxxxxxxxxxxxxxxxxxxxxxxx"/>
+<button class="absolute right-0 top-0 h-full px-4 text-[#616f89] dark:text-text-muted hover:text-blue-600 dark:hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</label>
+</div>
+<div>
+<button class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#f0f2f4] dark:bg-input-dark border border-transparent dark:border-border-dark px-4 py-2 text-sm font-medium text-[#111318] dark:text-text-main hover:bg-[#e1e4e8] dark:hover:bg-selection-bg/50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+                                    Test Connection
+                                </button>
+</div>
+</div>
+</section>
+<section class="flex flex-col bg-white dark:bg-card-dark rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-[#dbdfe6] dark:border-border-dark overflow-hidden">
+<div class="px-6 py-5 border-b border-[#f0f2f4] dark:border-border-dark flex justify-between items-center">
+<h2 class="text-[#111318] dark:text-text-main text-[20px] font-bold leading-tight tracking-[-0.015em]">Learning Goals</h2>
+<span class="material-symbols-outlined text-[#616f89] dark:text-text-muted">calendar_month</span>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-3">
+<label class="flex flex-col w-full">
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal pb-2">Daily New Words Limit</p>
+<div class="flex items-center gap-3">
+<input class="form-input w-24 rounded-lg text-[#111318] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbdfe6] dark:border-border-dark bg-white dark:bg-input-dark focus:border-blue-500 dark:focus:border-primary h-12 px-4 text-base font-normal leading-normal text-center" min="0" type="number" value="10"/>
+<span class="text-[#616f89] dark:text-text-muted text-sm">words / day</span>
+</div>
+</label>
+<p class="text-xs text-[#616f89] dark:text-text-muted leading-relaxed">
+                                    Adding too many new words can overwhelm your review queue. We recommend 10-20 for sustainable learning.
+                                </p>
+</div>
+<div class="flex flex-col gap-3">
+<label class="flex flex-col w-full">
+<p class="text-[#111318] dark:text-text-main text-sm font-medium leading-normal pb-2">Daily Review Words Limit</p>
+<div class="flex items-center gap-3">
+<input class="form-input w-24 rounded-lg text-[#111318] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbdfe6] dark:border-border-dark bg-white dark:bg-input-dark focus:border-blue-500 dark:focus:border-primary h-12 px-4 text-base font-normal leading-normal text-center" min="0" type="number" value="50"/>
+<span class="text-[#616f89] dark:text-text-muted text-sm">words / day</span>
+</div>
+</label>
+<p class="text-xs text-[#616f89] dark:text-text-muted leading-relaxed">
+                                    The maximum number of cards you want to review in a single session.
+                                </p>
+</div>
+</div>
+</section>
+<section class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-card-dark rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-[#dbdfe6] dark:border-border-dark p-6">
+<div class="flex flex-col gap-1">
+<h3 class="text-[#111318] dark:text-text-main text-base font-bold">Data Management</h3>
+<p class="text-[#616f89] dark:text-text-muted text-sm">Export your dictionary or clear cached data.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#dbdfe6] dark:border-border-dark bg-white dark:bg-input-dark px-4 py-2 text-sm font-medium text-[#111318] dark:text-text-main hover:bg-[#f0f2f4] dark:hover:bg-selection-bg/50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                Export JSON
+                            </button>
+</div>
+</section>
+</div>
+<div class="sticky bottom-0 z-10 mt-10 -mx-6 px-6 py-4 bg-white/80 dark:bg-background-dark/95 backdrop-blur-md border-t border-[#dbdfe6] dark:border-border-dark md:rounded-b-xl flex justify-end items-center gap-4">
+<button class="text-[#616f89] dark:text-text-muted text-sm font-medium hover:text-[#111318] dark:hover:text-white px-4 py-2 transition-colors">
+                        Reset to Defaults
+                     </button>
+<button class="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-lg bg-blue-600 dark:bg-primary px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-blue-700 dark:hover:bg-primary-dark transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 dark:focus:ring-primary dark:focus:ring-offset-background-dark">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                        Save Changes
+                     </button>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

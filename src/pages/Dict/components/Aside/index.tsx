@@ -12,7 +12,7 @@ export default function Aside() {
         </div>
       </div>
       <nav style={styles.nav}>
-        <a href="#" style={{...styles.navLink, ...styles.activeNavLink}}>
+        <a href="#" style={{ ...styles.navLink, ...styles.activeNavLink }}>
           <BookTwoTone style={styles.navIcon} twoToneColor="#135bec" />
           <span style={styles.navText}>Dictionary</span>
         </a>
