@@ -1,7 +1,30 @@
-import type { CSSProperties } from "react";
-import { BookTwoTone, SettingTwoTone, StarTwoTone, AudioOutlined, BookOutlined } from "@ant-design/icons";
+import type { CSSProperties, ReactElement } from "react";
 
-export default function Aside() {
+export interface MenuItem {
+  key: string;
+  title: string;
+  icon: ReactElement;
+  badge?: string | number;
+  category?: string; // For categorizing items (e.g., 'System')
+  component?: () => JSX.Element;
+}
+
+interface AsideProps {
+  menuItems: MenuItem[];
+  activeItem?: MenuItem;
+  onPress: (item: MenuItem) => void;
+}
+
+export default function Aside({ menuItems, activeItem, onPress }: AsideProps) {
+  const groupedMenuItems = menuItems.reduce((acc, item) => {
+    const category = item.category || 'default';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {} as Record<string, MenuItem[]>);
+
   return (
     <aside style={styles.aside}>
       <div style={styles.sidebarHeader}>
@@ -12,30 +35,36 @@ export default function Aside() {
         </div>
       </div>
       <nav style={styles.nav}>
-        <a href="#" style={{ ...styles.navLink, ...styles.activeNavLink }}>
-          <BookTwoTone style={styles.navIcon} twoToneColor="#135bec" />
-          <span style={styles.navText}>Dictionary</span>
-        </a>
-        <a href="#" style={styles.navLink}>
-          <AudioOutlined style={styles.navIcon} />
-          <span style={styles.navText}>Study Queue</span>
-          <span style={styles.badge}>12</span>
-        </a>
-        <a href="#" style={styles.navLink}>
-          <StarTwoTone style={styles.navIcon} />
-          <span style={styles.navText}>Favorites</span>
-        </a>
-        <a href="#" style={styles.navLink}>
-          <BookOutlined style={styles.navIcon} />
-          <span style={styles.navText}>History</span>
-        </a>
-        <div style={styles.navCategory}>
-          <p style={styles.categoryText}>System</p>
-        </div>
-        <a href="#" style={styles.navLink}>
-          <SettingTwoTone style={styles.navIcon} />
-          <span style={styles.navText}>Settings</span>
-        </a>
+        {Object.entries(groupedMenuItems).map(([category, items]) => (
+          <div key={category}>
+            {category !== 'default' && (
+              <div style={styles.navCategory}>
+                <p style={styles.categoryText}>{category}</p>
+              </div>
+            )}
+            {items.map((item) => (
+              <div
+                className="hover"
+                key={item.key}
+                style={
+                  item.key === activeItem?.key
+                    ? { ...styles.navLink, ...styles.activeNavLink }
+                    : styles.navLink
+                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPress(item);
+                }}
+              >
+                {item.icon && <span style={styles.navIcon}>{item.icon}</span>}
+                <span style={styles.navText}>{item.title}</span>
+                {item.badge && (
+                  <span style={styles.badge}>{item.badge}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
       </nav>
       <div style={styles.sidebarFooter}>
         <div style={styles.dailyGoalCard}>
@@ -62,6 +91,7 @@ const styles: { [key: string]: CSSProperties } = {
     flexDirection: 'column',
     zIndex: 20,
     height: '100%',
+    flexShrink: 0
   },
   sidebarHeader: {
     padding: '24px',
@@ -116,6 +146,8 @@ const styles: { [key: string]: CSSProperties } = {
     textDecoration: 'none',
     transition: 'background-color 0.2s',
     marginBottom: '4px',
+    userSelect: 'none',
+    cursor: 'pointer',
   },
   activeNavLink: {
     backgroundColor: 'rgba(19, 91, 236, 0.1)',
