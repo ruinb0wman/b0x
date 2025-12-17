@@ -8,3 +8,8 @@ body {
 .hover:hover {
   background: #1a1b26;
 }
+
+/* WebKit 浏览器滚动条 */
+::-webkit-scrollbar {
+  width: 0;
+}
