@@ -1,12 +1,12 @@
 import { createHashRouter } from 'react-router';
-import App from './App';
+import Apps from './pages/Apps';
 import Terminal from '@/pages/Terminal';
 import Ai from "./pages/Ai"
 
 export const router = createHashRouter([
   {
-    path: '/',
-    element: <App />,
+    path: '/board',
+    element: <Apps />,
   },
   {
     path: '/terminal',

@@ -12,7 +12,6 @@ export function useAiWindow() {
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.workAreaSize;
     const windowWidth = Math.floor(width / 3);
-    const windowX = width - windowWidth;
 
     win = new BrowserWindow({
       icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
@@ -20,7 +19,7 @@ export function useAiWindow() {
       minHeight: 600,
       width: windowWidth,
       height: height,
-      x: windowX,
+      x: 0,
       y: 0,
       frame: false, // Remove window frame
       autoHideMenuBar: true, // Hide the menu bar
@@ -39,17 +38,15 @@ export function useAiWindow() {
     }
 
     cb && cb(win);
-    win.on('closed', () => {
-      win = null;
-    })
 
     return win;
   }
 
   function init() {
-    if (win) return;
-    registerOperation(createWindow);
-    registerShortcuts(createWindow);
+    return createWindow();
+    // if (win) return win;
+    // registerOperation(createWindow);
+    // registerShortcuts(createWindow);
   }
 
   return { win, init }

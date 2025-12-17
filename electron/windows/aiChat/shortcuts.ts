@@ -2,6 +2,8 @@ import { type BrowserWindow, ipcMain, globalShortcut } from "electron"
 
 export function registerShortcuts(createWindow: (cb?: (win: BrowserWindow) => void) => BrowserWindow) {
   globalShortcut.register('Home', () => toggleWin('Home', createWindow))
+  globalShortcut.register('num7', () => console.log('num1'))
+  globalShortcut.register('1', () => console.log('1'))
 }
 
 export function registerOperation(createWindow: (cb?: (win: BrowserWindow) => void) => BrowserWindow) {

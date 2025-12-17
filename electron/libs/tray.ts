@@ -1,20 +1,28 @@
-import { Tray, Menu } from 'electron';
+import type { Window } from './windows';
+import { Tray } from 'electron';
 import { VITE_PUBLIC } from './env';
 import path from 'node:path';
 
 let tray = null
 
+interface CreateTrayProps { mainWindow: Window }
+
 export function useTray() {
-  function createTray() {
+
+  function createTray({ mainWindow }: CreateTrayProps) {
     tray = new Tray(path.join(VITE_PUBLIC, 'terminal.png'))
-    const contextMenu = Menu.buildFromTemplate([
-      { label: 'Item1', type: 'radio' },
-      { label: 'Item2', type: 'radio' },
-      { label: 'Item3', type: 'radio', checked: true },
-      { label: 'Item4', type: 'radio' }
-    ])
-    tray.setToolTip('This is my application.')
-    tray.setContextMenu(contextMenu)
+
+    tray.on('click', () => {
+      if (mainWindow.win) {
+        if (mainWindow.win.isVisible()) {
+          mainWindow.win.hide();
+        } else {
+          mainWindow.win.show();
+        }
+      } else {
+        mainWindow.init();
+      }
+    })
   }
 
   return { createTray }

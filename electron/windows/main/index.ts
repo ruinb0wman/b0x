@@ -1,20 +1,19 @@
 import { BrowserWindow } from "electron"
 import path from 'node:path'
 import { VITE_DEV_SERVER_URL, RENDERER_DIST, __dirname } from "../../libs/env";
-import { registerOperation } from "./operations"
-import { registerLifeCircle } from "./lifecircle";
-import { usePty } from "./pty"
-const pty = usePty();
 
-export function useTerminalWindow() {
+const HASH = "board"
+
+export function useMainWindow() {
   let win: null | BrowserWindow;
 
   function createWindow(cb?: (win: BrowserWindow) => void) {
     win = new BrowserWindow({
       icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
       frame: false,
-      minWidth: 800,
-      minHeight: 600,
+      width: 400,
+      height: 400,
+      resizable: false,
       titleBarStyle: 'hidden',
       autoHideMenuBar: true,
       webPreferences: {
@@ -29,10 +28,10 @@ export function useTerminalWindow() {
     })
 
     if (VITE_DEV_SERVER_URL) {
-      win.loadURL(`${VITE_DEV_SERVER_URL}/#/terminal`)
+      win.loadURL(`${VITE_DEV_SERVER_URL}/#/${HASH}`)
       win.webContents.openDevTools();
     } else {
-      win.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: 'terminal' })
+      win.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: HASH })
     }
 
     cb && cb(win);
@@ -41,11 +40,7 @@ export function useTerminalWindow() {
   }
 
   function init() {
-    return createWindow((win) => {
-      registerOperation(win);
-      registerLifeCircle(win);
-      pty.init(win);
-    });
+    return createWindow();
   }
 
   return { createWindow, init }
