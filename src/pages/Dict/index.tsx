@@ -5,6 +5,7 @@ import Home from "./components/Home";
 import Favorite from "./components/Favorite";
 import Setting from "./components/Setting";
 import Study from "./components/Study"
+import History from "./components/History"
 // import Home from "./components/Test"
 
 export default function Dict() {
@@ -56,6 +57,7 @@ const menuItems: MenuItem[] = [
     key: 'history',
     title: 'History',
     icon: <HistoryOutlined />,
+    component: () => <History />
   },
   {
     key: 'settings',

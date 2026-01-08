@@ -1,0 +1,23 @@
+/* Custom scrollbar for webkit browsers */
+.history-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history-container::-webkit-scrollbar-track {
+  background: #1a1d23;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+  background: #2d333b;
+  border-radius: 4px;
+}
+
+.history-container::-webkit-scrollbar-thumb:hover {
+  background: #3e4652;
+}
+
+/* For Firefox */
+.history-container {
+  scrollbar-width: thin;
+  scrollbar-color: #2d333b #1a1d23;
+}

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Dictionary - History</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f9fafb",
+                        "background-dark": "#1a1d23",
+                        "surface-dark": "#23272f",
+                        "surface-highlight": "#2d333b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1d23;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d333b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3e4652;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col w-72 h-full border-r border-slate-200 dark:border-surface-highlight bg-white dark:bg-surface-dark flex-shrink-0">
+<div class="flex items-center gap-3 p-6">
+<div class="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined !text-3xl">auto_stories</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-none tracking-tight">Lexicon AI</h1>
+<span class="text-xs text-slate-500 dark:text-slate-400 mt-1">Pro Plan</span>
+</div>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">search</span>
+<span class="text-sm font-medium">Dictionary</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="text-sm font-medium">History</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">bookmark</span>
+<span class="text-sm font-medium">Saved Words</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">school</span>
+<span class="text-sm font-medium">Flashcards</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-surface-highlight">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3">
+<div class="h-8 w-8 rounded-full bg-cover bg-center" data-alt="User profile avatar gradient" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDsFx4o5IbHVqcOwe691dtBG8T_HoEgFErYtzn-WzAVd7ck3jjiuJi0A5Z-9bCh0kSXhiyANuVJRvZzb66NorW5Wax8AQOyZsHtkQpieZOwwo83CyKKvHX1klWIJ3WjoTlMeOY_QfyJLb5hVqIb_pG-zmcxHm6SyqQSr_ZQ0q727RxfXdX6Z8VcktX5U_58ygGx_I8bLqfM_K3cY9o7MZRN3tpEI-s2sQ9mwGwedndZJsvalGFlbxqbfZ6BO37Y8cZT-sUf2XPDFTQ');"></div>
+<div class="flex flex-col">
+<span class="text-xs font-medium dark:text-white">Alex Morgan</span>
+<span class="text-[10px] text-slate-500">alex@example.com</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 h-full relative overflow-hidden">
+<!-- Top Header -->
+<header class="flex items-center justify-between px-8 py-5 border-b border-transparent dark:border-surface-highlight bg-background-light dark:bg-background-dark z-10 shrink-0">
+<div class="flex flex-col gap-1">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Search History</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Review your learning path and rediscover words.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-surface-highlight rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">file_upload</span>
+                        Export
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">delete_sweep</span>
+                        Clear History
+                    </button>
+</div>
+</header>
+<!-- Search Filter Area -->
+<div class="px-8 pt-4 pb-2 shrink-0">
+<div class="relative max-w-lg">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 material-symbols-outlined">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm" placeholder="Filter history..." type="text"/>
+</div>
+</div>
+<!-- Scrollable List Container -->
+<div class="flex-1 overflow-y-auto px-8 pb-10 pt-2 space-y-8">
+<!-- Group: Today -->
+<section>
+<div class="sticky top-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm py-3 z-10 flex items-center gap-3">
+<h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today</h3>
+<div class="h-px flex-1 bg-slate-200 dark:bg-surface-highlight"></div>
+</div>
+<div class="grid gap-3">
+<!-- History Item 1 -->
+<div class="group relative flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight hover:border-primary/50 dark:hover:border-primary/50 rounded-xl transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/20 cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0 mt-1 sm:mt-0">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Serendipity</h4>
+<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-surface-highlight text-slate-500 dark:text-slate-400">noun</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">The occurrence and development of events by chance in a happy or beneficial way.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-3 sm:mt-0 pl-14 sm:pl-0">
+<span class="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">10 mins ago</span>
+<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-200">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors" title="Re-query">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="group relative flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight hover:border-primary/50 dark:hover:border-primary/50 rounded-xl transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/20 cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 shrink-0 mt-1 sm:mt-0">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Cognitive Dissonance</h4>
+<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-surface-highlight text-slate-500 dark:text-slate-400">psychology</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">Mental discomfort experienced by a person who holds two or more contradictory beliefs.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-3 sm:mt-0 pl-14 sm:pl-0">
+<span class="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">2 hours ago</span>
+<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-200">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors" title="Re-query">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="group relative flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight hover:border-primary/50 dark:hover:border-primary/50 rounded-xl transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/20 cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 shrink-0 mt-1 sm:mt-0">
+<span class="material-symbols-outlined">translate</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Schadenfreude</h4>
+<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-surface-highlight text-slate-500 dark:text-slate-400">noun • german</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">Pleasure derived by someone from another person's misfortune.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-3 sm:mt-0 pl-14 sm:pl-0">
+<span class="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">4:32 PM</span>
+<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-200">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors" title="Re-query">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Group: Yesterday -->
+<section>
+<div class="sticky top-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm py-3 z-10 flex items-center gap-3">
+<h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Yesterday</h3>
+<div class="h-px flex-1 bg-slate-200 dark:bg-surface-highlight"></div>
+</div>
+<div class="grid gap-3">
+<!-- History Item 4 -->
+<div class="group relative flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight hover:border-primary/50 dark:hover:border-primary/50 rounded-xl transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/20 cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0 mt-1 sm:mt-0">
+<span class="material-symbols-outlined">wb_sunny</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Ephemeral</h4>
+<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-surface-highlight text-slate-500 dark:text-slate-400">adjective</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">Lasting for a very short time.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-3 sm:mt-0 pl-14 sm:pl-0">
+<span class="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">9:15 AM</span>
+<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-200">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors" title="Re-query">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- History Item 5 -->
+<div class="group relative flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight hover:border-primary/50 dark:hover:border-primary/50 rounded-xl transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/20 cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0 mt-1 sm:mt-0">
+<span class="material-symbols-outlined">auto_fix</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Ubiquitous</h4>
+<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-surface-highlight text-slate-500 dark:text-slate-400">adjective</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">Present, appearing, or found everywhere.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-3 sm:mt-0 pl-14 sm:pl-0">
+<span class="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">8:05 AM</span>
+<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-200">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors" title="Re-query">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="flex justify-center py-6">
+<button class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-surface-highlight text-slate-600 dark:text-slate-300 text-sm font-medium rounded-full shadow-sm hover:bg-slate-50 dark:hover:bg-surface-dark dark:hover:text-white transition-all border border-slate-200 dark:border-transparent">
+<span>Load More</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>
