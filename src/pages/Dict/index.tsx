@@ -1,6 +1,5 @@
-import type { CSSProperties } from "react";
 import { useState, useEffect } from "react";
-import { BookTwoTone, SettingTwoTone, StarTwoTone, AudioOutlined, BookOutlined } from "@ant-design/icons";
+import { BookOutlined, SettingOutlined, StarOutlined, AudioOutlined, HistoryOutlined } from "@ant-design/icons";
 import Aside, { type MenuItem } from "./components/Aside";
 import Home from "./components/Home";
 import Favorite from "./components/Favorite";
@@ -33,41 +32,46 @@ export default function Dict() {
   );
 }
 
-const menuItems = [
+const menuItems: MenuItem[] = [
   {
     key: 'dictionary',
     title: 'Dictionary',
-    icon: <BookTwoTone twoToneColor="#135bec" />,
-    component: Home,
+    icon: <BookOutlined />,
+    component: () => <Home />,
   },
   {
     key: 'study-queue',
     title: 'Study Queue',
     icon: <AudioOutlined />,
     badge: 12,
-    component: Study,
+    component: () => <Study />,
   },
   {
     key: 'favorites',
     title: 'Favorites',
-    icon: <StarTwoTone />,
-    component: Favorite,
+    icon: <StarOutlined />,
+    component: () => <Favorite />,
   },
   {
     key: 'history',
     title: 'History',
-    icon: <BookOutlined />,
+    icon: <HistoryOutlined />,
   },
   {
     key: 'settings',
     title: 'Settings',
-    icon: <SettingTwoTone />,
+    icon: <SettingOutlined />,
     category: 'System',
-    component: Setting,
+    component: () => <Setting />,
   },
 ];
 
-const styles: { [key: string]: CSSProperties } = {
+// Extend CSSProperties to include vendor-specific properties
+type ExtendedCSSProperties = React.CSSProperties & {
+  WebkitAppRegion?: 'drag' | 'no-drag';
+};
+
+const styles: { [key: string]: ExtendedCSSProperties } = {
   headerBar: {
     WebkitAppRegion: 'drag',
     width: '100%',
