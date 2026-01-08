@@ -5,6 +5,8 @@ import Aside, { type MenuItem } from "./components/Aside";
 import Home from "./components/Home";
 import Favorite from "./components/Favorite";
 import Setting from "./components/Setting";
+import Study from "./components/Study"
+// import Home from "./components/Test"
 
 export default function Dict() {
   const [activeItem, setActiveItem] = useState<MenuItem>();
@@ -43,6 +45,7 @@ const menuItems = [
     title: 'Study Queue',
     icon: <AudioOutlined />,
     badge: 12,
+    component: Study,
   },
   {
     key: 'favorites',
